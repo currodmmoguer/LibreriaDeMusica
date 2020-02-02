@@ -8,7 +8,8 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
-
+import javax.persistence.JoinTable;
+import javax.persistence.ManyToMany;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
 
@@ -26,12 +27,17 @@ public class Artista {
 	private int id;
 	
 	@Column(name="Nombre")
+	//@NotBlank
 	private String nombre;
 	
 	@OneToMany
 	@JoinColumn(name="IdArtista")
 	@IndexColumn(name="idx")
 	private List<Album> albunes;
+	
+	@ManyToMany(cascade = {CascadeType.ALL})
+	@JoinTable(name="ArtistaCancion", joinColumns = {@JoinColumn(name="IdArtista")}, inverseJoinColumns = {@JoinColumn(name="IdCancion")})
+	private List<Cancion> canciones;
 	
 	public Artista() {
 		// TODO Auto-generated constructor stub

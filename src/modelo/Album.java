@@ -8,11 +8,9 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
-import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
 
-import org.hibernate.annotations.IndexColumn;
 import org.hibernate.annotations.Type;
 
 @Entity
@@ -27,18 +25,22 @@ public class Album {
 	
 	
 	@Column(name="Nombre")
+	//@NotBlank
 	private String nombre;
 	
 	@Column(name="IdArtista")
 	@Type(type="integer")
+	//@NotNull
 	private Artista artista;
 	
 	@OneToMany
 	@JoinColumn(name="IdAlbum")
 	//@IndexColumn(name="idx")
+	//@Size(min=1)
 	private List<Cancion> canciones;
 	
 	@Column(name="Publicacion")
+	//@NotNull
 	private LocalDate lanzamiento;
 	
 	public Album() {}

@@ -2,11 +2,13 @@ package modelo;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
-import java.util.LinkedList;
 import java.util.List;
+
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
@@ -14,10 +16,7 @@ import javax.persistence.JoinColumn;
 import javax.persistence.JoinTable;
 import javax.persistence.ManyToMany;
 import javax.persistence.ManyToOne;
-import javax.persistence.OneToMany;
 import javax.persistence.Table;
-
-import org.hibernate.annotations.NotFound;
 import org.hibernate.annotations.Type;
 
 @Entity
@@ -31,30 +30,36 @@ public class Cancion {
 	private int id;
 	
 	@Column(name = "Nombre")
+	//@NotBlank
 	private String nombre;
 
-	//No sale correcta porq es manyToMany
-	@OneToMany() // Sin cascade
-	@JoinColumn(name = "IdArtista")
-	private List<Artista> artistas;
 
+	@ManyToMany(cascade = {CascadeType.ALL}, mappedBy = "canciones")
+	private List<Artista> artistas;
+	
 	@ManyToOne
 	@JoinColumn(name = "IdAlbum")
 	private Album album;
 
 	@Column(name = "Duracion")
+	//@NotNull
 	private LocalTime duración;
 
 	@Column(name = "Publicacion")
+	//@NotNull
 	private LocalDate publicacion;
 	
-	//@ManyToMany
-	//@JoinTable(name="PlaylisCancion", joinColumns = {@JoinColumn(name="IdCacion")}, inverseJoinColumns = {@JoinColumn(name="IdPlaylist")})
-	//private List<Playlist> playlists = new LinkedList<>();
+	@ManyToMany
+	@JoinTable(name="PlaylisCancion", joinColumns = {@JoinColumn(name="IdCacion")}, inverseJoinColumns = {@JoinColumn(name="IdPlaylist")})
+	private List<Playlist> playlists;
+	
+	@Enumerated(EnumType.STRING)
+	private Genero genero;
 
+	
 	public Cancion() {}
 
-	public Cancion(String nombre, List<Artista> artistas, Album album, LocalTime duración, LocalDate publicacion)
+	public Cancion(String nombre, List<Artista> artistas, Album album, LocalTime duración, LocalDate publicacion, Genero genero)
 			throws ReproductorException {
 
 		if (artistas.size() == 0)
@@ -65,6 +70,7 @@ public class Cancion {
 		this.album = album;
 		this.duración = duración;
 		this.publicacion = publicacion;
+		this.genero = genero;
 
 	}
 
