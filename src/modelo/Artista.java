@@ -1,9 +1,11 @@
 package modelo;
+import java.util.LinkedList;
 import java.util.List;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
@@ -35,7 +37,7 @@ public class Artista {
 	@IndexColumn(name="idx")
 	private List<Album> albunes;
 	
-	@ManyToMany(cascade = {CascadeType.ALL})
+	@ManyToMany(cascade = {CascadeType.ALL}, fetch = FetchType.EAGER)
 	@JoinTable(name="ArtistaCancion", joinColumns = {@JoinColumn(name="IdArtista")}, inverseJoinColumns = {@JoinColumn(name="IdCancion")})
 	private List<Cancion> canciones;
 	
@@ -46,6 +48,13 @@ public class Artista {
 	public Artista(String nombre) {
 		super();
 		this.nombre = nombre;
+		this.canciones = new LinkedList<Cancion>();
+	}
+	
+	public Artista(String nombre, List<Cancion> canciones) {
+		super();
+		this.nombre = nombre;
+		this.canciones = canciones;
 	}
 
 	public String getNombre() {
@@ -58,6 +67,18 @@ public class Artista {
 
 	public int getId() {
 		return id;
+	}
+	
+	public List<Cancion> getCanciones() {
+		return canciones;
+	}
+	
+	public void cambiarNombre(String nombre) throws ReproductorException {
+		if (nombre == null || nombre.length() == 0)
+			throw new ReproductorException("No puedes dejar el nombre vacío.");
+		
+		this.setNombre(nombre);
+		System.out.println("Se ha modificado el nombre correctamente.");
 	}
 
 	@Override

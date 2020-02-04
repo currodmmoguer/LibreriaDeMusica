@@ -1,0 +1,2 @@
+Obtiene las canciones de un artista indicando el nombre de la cancion y el id del artista
+SELECT c.* FROM `Artista` as a INNER JOIN `ArtistaCancion` as ac on a.id=ac.idArtista INNER JOIN `Cancion` as c ON c.id=ac.idCancion where a.id = 1 AND c.nombre='Cancion 1'

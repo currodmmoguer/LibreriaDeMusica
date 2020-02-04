@@ -1,5 +1,6 @@
 package modelo;
 import java.time.LocalDate;
+import java.util.LinkedList;
 import java.util.List;
 
 import javax.persistence.Column;
@@ -45,10 +46,11 @@ public class Album {
 	
 	public Album() {}
 	
-	public Album(String nombre, Artista artista, LocalDate publicacion) {
+	public Album(String nombre, Artista artista, LinkedList<Cancion> canciones, LocalDate publicacion) {
 		super();
 		this.nombre = nombre;
 		this.artista = artista;
+		this.canciones = canciones;
 		this.lanzamiento = publicacion;
 	}
 	public String getNombre() {
@@ -69,6 +71,15 @@ public class Album {
 	public void setPublicacion(LocalDate publicacion) {
 		this.lanzamiento = publicacion;
 	}
+	
+	public List<Cancion> getCanciones() {
+		return canciones;
+	}
+	
+	public void setCanciones(List<Cancion> canciones) {
+		this.canciones = canciones;
+	}
+	
 	public int getId() {
 		return id;
 	}

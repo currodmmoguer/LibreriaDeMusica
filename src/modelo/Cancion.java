@@ -9,6 +9,7 @@ import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
@@ -34,7 +35,7 @@ public class Cancion {
 	private String nombre;
 
 
-	@ManyToMany(cascade = {CascadeType.ALL}, mappedBy = "canciones")
+	@ManyToMany(mappedBy = "canciones", fetch = FetchType.EAGER)
 	private List<Artista> artistas;
 	
 	@ManyToOne
@@ -50,7 +51,7 @@ public class Cancion {
 	private LocalDate publicacion;
 	
 	@ManyToMany
-	@JoinTable(name="PlaylisCancion", joinColumns = {@JoinColumn(name="IdCacion")}, inverseJoinColumns = {@JoinColumn(name="IdPlaylist")})
+	@JoinTable(name="PlaylistCancion", joinColumns = {@JoinColumn(name="IdCacion")}, inverseJoinColumns = {@JoinColumn(name="IdPlaylist")})
 	private List<Playlist> playlists;
 	
 	@Enumerated(EnumType.STRING)

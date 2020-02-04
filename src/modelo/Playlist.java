@@ -13,6 +13,7 @@ import javax.persistence.JoinTable;
 import javax.persistence.ManyToMany;
 import javax.persistence.Table;
 
+import org.hibernate.Session;
 import org.hibernate.annotations.Type;
 
 @Entity
@@ -29,6 +30,9 @@ public class Playlist {
 	//@NotBlank
 	private String nombre;
 	
+	@Column(name="Descripcion")
+	private String descripcion;
+	
 	@ManyToMany(mappedBy = "playlists")
 	private List<Cancion> canciones;
 
@@ -36,10 +40,18 @@ public class Playlist {
 		// TODO Auto-generated constructor stub
 	}
 
-	public Playlist(String nombre) {
+	public Playlist(String nombre, String descripcion) {
 		super();
 		this.nombre = nombre;
-		//canciones = new LinkedList<>();
+		this.descripcion = descripcion;
+		canciones = new LinkedList<>();
+	}
+	
+	public Playlist(String nombre, String descripcion, LinkedList<Cancion> canciones) {
+		super();
+		this.nombre = nombre;
+		this.descripcion = descripcion;
+		this.canciones = canciones;
 	}
 
 	public String getNombre() {
@@ -49,17 +61,60 @@ public class Playlist {
 	public void setNombre(String nombre) {
 		this.nombre = nombre;
 	}
+	
+	public String getDescripcion() {
+		return descripcion;
+	}
+	
+	public void setDescripcion(String descripcion) {
+		this.descripcion = descripcion;
+	}
 
 	public List<Cancion> getCanciones() {
 		return canciones;
 	}
 
-	public void setCanciones(List<Cancion> canciones) {
+	public void setCanciones(LinkedList<Cancion> canciones) {
 		this.canciones = canciones;
 	}
 	
-	public void addCancion(Cancion cancion) {
-		canciones.add(cancion);
+	public boolean addCancion(Cancion cancion) {
+		boolean contiene = true;
+		LinkedList<Cancion> canciones = convertirALinked();
+		if (!canciones.contains(cancion)) {
+			canciones.push(cancion);
+			contiene = false;
+		}
+		
+		return contiene;
+	}
+	
+	public void cambiarNombre(String nombre) throws ReproductorException {
+		if (nombre == null || nombre.length() == 0) 
+			throw new ReproductorException("No puedes dejar el nombre vacío.");
+		
+		this.setNombre(nombre);
+		System.out.println("Se ha cambiado el nombre de la playlist correctamente.");
+		
+	}
+	
+	public void cambiarDescripcion(String descripcion) {
+		this.setDescripcion(descripcion);
+		System.out.println("Se ha cambiado la descripción de la playlist correctamente.");
+	}
+	
+	public LinkedList<Cancion> convertirALinked() {
+		LinkedList<Cancion> lista = new LinkedList<Cancion>();
+		
+		for (Cancion c : this.getCanciones()) {
+			lista.add(c);
+		}
+		
+		return lista;
+	}
+	
+	public void borrarCancion(int i) {
+		this.canciones.remove(i);
 	}
 
 	public int getId() {
