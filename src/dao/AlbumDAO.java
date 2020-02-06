@@ -1,5 +1,6 @@
 package dao;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.hibernate.Query;
@@ -20,6 +21,14 @@ public class AlbumDAO extends GenericDAO<Album> {
 		
 		session.close();
 		return album;
+	}
+	
+	public List<Album> obtenerListaAlbumPorNombre(String nombre){
+		Session session = HibernateUtil.getSessionFactory().openSession();
+		Query query = session.createQuery("SELECT a FROM Album a WHERE Nombre='"+nombre+"'");
+		List<Album> albunes = query.list();
+		session.close();
+		return albunes;
 	}
 	
 	public List<Album> obtenerAlbunesPorArtista(int id){
@@ -47,4 +56,6 @@ public class AlbumDAO extends GenericDAO<Album> {
 		session.close();
 		return album;
 	}
+	
+
 }

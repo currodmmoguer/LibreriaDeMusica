@@ -22,7 +22,7 @@ public class PlaylistDAO extends GenericDAO<Playlist> {
 		List<Playlist> lista;
 		String expresion = "^[a-zA-Z0-9 ]*" + nombre + "[a-zA-Z0-9 ]*";
 		Session session = HibernateUtil.getSessionFactory().openSession();
-		Query query = session.createQuery("SELECT p FROM Playlist p WHERE Nombre LIKE '" + nombre + "'");
+		Query query = session.createQuery("SELECT p FROM Playlist p WHERE Nombre LIKE '%" + nombre + "%'");
 		lista = query.list();
 		
 		session.close();
