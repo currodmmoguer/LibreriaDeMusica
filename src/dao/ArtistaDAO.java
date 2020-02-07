@@ -12,6 +12,13 @@ import modelo.HibernateUtil;
 
 public class ArtistaDAO extends GenericDAO<Artista>{
 	
+	public Artista getArtista(int id) {
+		Session session = HibernateUtil.getSessionFactory().openSession();
+		Artista artista = (Artista) session.get(Artista.class, id);
+		session.close();
+		return artista;
+	}
+	
 	public Artista obtenerArtistaPorNombre(String nombre) {
 		Session session = HibernateUtil.getSessionFactory().openSession();
 		Artista artista = null;
@@ -20,6 +27,13 @@ public class ArtistaDAO extends GenericDAO<Artista>{
 			artista = (Artista) query.list().get(0);
 		session.close();
 		return artista;
+	}
+	
+	public List<Artista> obtenerListaArtistasPorNombre(String nombre){
+		Session session = HibernateUtil.getSessionFactory().openSession();
+		List<Artista> artistas = session.createQuery("SELECT a FROM Artista a WHERE Nombre LIKE '%" + nombre + "%'").list();
+		session.close();
+		return artistas;
 	}
 	
 	public boolean tieneCancion(String nombreArtista, String nombreCancion) {
@@ -40,6 +54,18 @@ public class ArtistaDAO extends GenericDAO<Artista>{
 		session.close();
 		
 		return lista;
+	}
+	
+	/**
+	 * Sin probrar
+	 * @return
+	 */
+	public int totalArtistas() {
+		Session session = HibernateUtil.getSessionFactory().openSession();
+		Query query = session.createQuery("SELECT COUNT(a) FROM Artista a");
+		int total = (int) query.list().get(0);
+		session.close();
+		return total;
 	}
 
 	

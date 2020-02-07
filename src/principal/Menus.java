@@ -3,17 +3,17 @@ package principal;
 import java.util.Scanner;
 
 public class Menus {
-	
+
 	private static Scanner teclado = new Scanner(System.in);
 
 	protected static int menuPrincipal() {
 		int opc;
 
 		System.out.println("\nGESTIÓN DE BASE DE DATOS DE REPRODUCTOR MULTIMEDIA");
-		System.out.println("1. Consultas");
-		System.out.println("2. Altas");
-		System.out.println("3. Bajas");
-		System.out.println("4. Actualizaciones");
+		System.out.println("1. Canciones");
+		System.out.println("2. Artistas");
+		System.out.println("3. Albunes");
+		System.out.println("4. Playlists");
 		System.out.println("5. Salir");
 
 		do {
@@ -23,84 +23,78 @@ public class Menus {
 
 		return opc;
 	}
-	
-	protected static int menuConsultas() {
-		int opc;
 
-		System.out.println("1. Consultar todos los artistas");
-		System.out.println("2. Consultar todas las playlist");
-		System.out.println("3. Consultar los albunes de un artista");
-		System.out.println("4. Consultar todas las canciones de un artista"); // Ordenado Fecha, Alfabetico
-		System.out.println("5. Consultar album"); // Por nombre o id
-		System.out.println("6. Consultar playlist"); // Por nombre o id
-		System.out.println("7. Consultar playlist que contenga una cancion");
-		System.out.println("8. Consultar cual es el genero más escuchado de una playlist");
-		System.out.println("X. Volver");
+	
+
+	protected static int menuArtistas() {
+		int opc;
+		System.out.println("1. Alta artista");
+		System.out.println("2. Borrar artista");
+		System.out.println("3. Consultar todos los artista");
+		System.out.println("4. Consultar los albunes de un artista");
+		System.out.println("5. Consultar las canciones de un artista"); // Ordenado por fecha, alfabeticamente
+		System.out.println("6. Cambiar nombre");
+		System.out.println("7. Volver");
 
 		do {
 			System.out.print("Inroduce opcion: ");
 			opc = Integer.parseInt(teclado.nextLine());
-		} while (opc < 1 || opc > 9);
+		} while (opc < 1 || opc > 7);
 		return opc;
-	}
-	
-	protected static int menuAltas() {
-		int opc;
-		System.out.println("1. Nuevo artista");
-		System.out.println("2. Nueva canción");
-		System.out.println("3. Nuevo album");
-		System.out.println("4. Nueva playlis");
-		System.out.println("5. Volver");
-		do {
-			System.out.print("Inroduce opcion: ");
-			opc = Integer.parseInt(teclado.nextLine());
-		} while (opc < 1 || opc > 5);
-		return opc;
-	}
-	
-	protected static int menuBajas() {
-		int opc;
 
-		System.out.println("1. Eliminar cancion");
-		System.out.println("2. Eliminar artista");
-		System.out.println("3. Eliminar album");
-		System.out.println("4. Eliminar playlist");
-		System.out.println("5. Volver");
+	}
+
+	protected static int menuCancion() {
+		int opc;
+		System.out.println("1. Alta canción");
+		System.out.println("2. Borrar canción");
+		System.out.println("3. Consultar el género más escuchado");
+		System.out.println("4. Volver");
+
 		do {
 			System.out.print("Inroduce opcion: ");
 			opc = Integer.parseInt(teclado.nextLine());
-		} while (opc < 1 || opc > 5);
+		} while (opc < 1 || opc > 4);
 		return opc;
+
 	}
-	
+
+	protected static int menuAlbum() {
+		int opc;
+		System.out.println("1. Alta album");
+		System.out.println("2. Borrar album");
+		System.out.println("3. Consultar album");
+		System.out.println("4. Volver");
+
+		do {
+			System.out.print("Inroduce opcion: ");
+			opc = Integer.parseInt(teclado.nextLine());
+		} while (opc < 1 || opc > 4);
+		return opc;
+
+	}
+
 	protected static int menuPlaylist() {
 		int opc;
 
-		System.out.println("1. Cambiar nombre");
-		System.out.println("2. Cambiar descripcion");
-		System.out.println("3. Añadir canciones");
-		System.out.println("4. Eliminar canciones");
-		System.out.println("5. Volver");
+		System.out.println("1. Alta playlist");
+		System.out.println("2. Borrar playlist");
+		System.out.println("3. Cambiar nombre");
+		System.out.println("4. Cambiar descripcion");
+		System.out.println("5. Añadir canciones");
+		System.out.println("6. Eliminar canciones");
+		System.out.println("7. Consultar todas las playlist");
+		System.out.println("8. Consultar playlist");
+		System.out.println("9. Consultar playlist que contengan una canción");
+		System.out.println("10. Consultar cual es el género más escuchado de una playlist");
+		System.out.println("11. Volver");
 
 		do {
 			System.out.print("Inroduce opcion: ");
 			opc = Integer.parseInt(teclado.nextLine());
-		} while (opc < 1 || opc > 5);
+		} while (opc < 1 || opc > 11);
 
-		return opc;
-	}	
-	
-	protected static int menuActualizaciones() {
-		int opc;
-		System.out.println("1. Cambiar nombre a artista");
-		System.out.println("2. Editar playlist");
-		System.out.println("3. Volver");
-
-		do {
-			System.out.print("Inroduce opcion: ");
-			opc = Integer.parseInt(teclado.nextLine());
-		} while (opc < 1 || opc > 3);
 		return opc;
 	}
-	
+
 }

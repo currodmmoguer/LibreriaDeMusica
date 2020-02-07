@@ -1,10 +1,11 @@
 package modelo;
+import java.io.Serializable;
 import java.util.LinkedList;
 import java.util.List;
 
-import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
@@ -14,11 +15,15 @@ import javax.persistence.ManyToMany;
 import javax.persistence.Table;
 
 import org.hibernate.Session;
+import org.hibernate.annotations.Cascade;
+import org.hibernate.annotations.CascadeType;
+import org.hibernate.annotations.Fetch;
+import org.hibernate.annotations.FetchMode;
 import org.hibernate.annotations.Type;
 
 @Entity
 @Table(name="Playlist")
-public class Playlist {
+public class Playlist implements Serializable{
 
 	@Id
 	@Type(type="integer")
@@ -33,9 +38,13 @@ public class Playlist {
 	@Column(name="Descripcion")
 	private String descripcion;
 	
-	@ManyToMany(mappedBy = "playlists")
-	private List<Cancion> canciones;
 
+	@ManyToMany(fetch = FetchType.EAGER)
+	@Cascade(CascadeType.SAVE_UPDATE)
+	@Fetch(value = FetchMode.SUBSELECT)
+	@JoinTable(name="PlaylistCancion", joinColumns = {@JoinColumn(name="IdPlaylist")}, inverseJoinColumns = {@JoinColumn(name="IdCancion")})
+	private List<Cancion> canciones;
+	
 	public Playlist() {
 		// TODO Auto-generated constructor stub
 	}
@@ -82,9 +91,13 @@ public class Playlist {
 		boolean contiene = true;
 		LinkedList<Cancion> canciones = convertirALinked();
 		if (!canciones.contains(cancion)) {
+			System.out.println("No contiene");
 			canciones.push(cancion);
 			contiene = false;
 		}
+		
+		//System.out.println(canciones);
+		this.canciones = canciones;
 		
 		return contiene;
 	}
@@ -158,7 +171,7 @@ public class Playlist {
 
 	@Override
 	public String toString() {
-		return "Playlist [id=" + id + ", nombre=" + nombre + ", canciones="  + "]";
+		return "Playlist [id=" + id + ", nombre=" + nombre + ", canciones="  + canciones.toString() + "]";
 	}
 	
 	

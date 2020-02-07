@@ -1,6 +1,9 @@
 package modelo;
+import java.io.Serializable;
+import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Set;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
@@ -15,12 +18,13 @@ import javax.persistence.ManyToMany;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
 
+import org.hibernate.annotations.Cascade;
 import org.hibernate.annotations.IndexColumn;
 import org.hibernate.annotations.Type;
 
 @Entity
 @Table(name="Artista")
-public class Artista {
+public class Artista implements Serializable {
 	
 	@Id
 	@Type(type="integer")
@@ -37,9 +41,10 @@ public class Artista {
 	@IndexColumn(name="idx")
 	private List<Album> albunes;
 	
-	@ManyToMany(cascade = {CascadeType.ALL}, fetch = FetchType.EAGER)
+	@ManyToMany(fetch = FetchType.EAGER)
+	@Cascade(org.hibernate.annotations.CascadeType.SAVE_UPDATE)
 	@JoinTable(name="ArtistaCancion", joinColumns = {@JoinColumn(name="IdArtista")}, inverseJoinColumns = {@JoinColumn(name="IdCancion")})
-	private List<Cancion> canciones;
+	private Set<Cancion> canciones;
 	
 	public Artista() {
 		// TODO Auto-generated constructor stub
@@ -48,10 +53,10 @@ public class Artista {
 	public Artista(String nombre) {
 		super();
 		this.nombre = nombre;
-		this.canciones = new LinkedList<Cancion>();
+		this.canciones = new HashSet<Cancion>();
 	}
 	
-	public Artista(String nombre, List<Cancion> canciones) {
+	public Artista(String nombre, Set<Cancion> canciones) {
 		super();
 		this.nombre = nombre;
 		this.canciones = canciones;
@@ -69,7 +74,7 @@ public class Artista {
 		return id;
 	}
 	
-	public List<Cancion> getCanciones() {
+	public Set<Cancion> getCanciones() {
 		return canciones;
 	}
 	

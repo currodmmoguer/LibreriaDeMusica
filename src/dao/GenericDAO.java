@@ -22,5 +22,13 @@ public class GenericDAO<T> {
 		session.close();
 	}
 	
+	public void actualizar(T entidad) {
+		Session session = HibernateUtil.getSessionFactory().openSession();
+		session.beginTransaction();
+		session.update(entidad);
+		session.getTransaction().commit();
+		session.close();
+	}
+	
 
 }

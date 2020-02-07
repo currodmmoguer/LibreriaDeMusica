@@ -1,4 +1,5 @@
 package modelo;
+import java.io.Serializable;
 import java.time.LocalDate;
 import java.util.LinkedList;
 import java.util.List;
@@ -16,7 +17,7 @@ import org.hibernate.annotations.Type;
 
 @Entity
 @Table(name="Album")
-public class Album {
+public class Album implements Serializable{
 
 	@Id
 	@Type(type="integer")

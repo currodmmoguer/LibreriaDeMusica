@@ -31,7 +31,7 @@ public class Principal {
 	public static void main(String[] args) {
 		// SessionFactory sessionFactory = HibernateUtil.getSessionFactory();
 
-		prueba();
+		// prueba();
 		int opc = 0;
 		do {
 			try {
@@ -95,6 +95,9 @@ public class Principal {
 		LocalDate publicacion = solicitarPublicacion();
 		Genero genero = solicitarGenero();
 		Cancion cancion = new Cancion(nombre, artistas, album, duracion, publicacion, genero);
+		for (Artista a : artistas) {
+			a.getCanciones().add(cancion);
+		}
 		System.out.println(cancion);
 		return cancion;
 	}
@@ -239,6 +242,11 @@ public class Principal {
 
 	}
 
+	/**
+	 * No deja borrarlo
+	 * 
+	 * @throws ReproductorException
+	 */
 	private static void bajaCancion() throws ReproductorException {
 		CancionDAO dao = new CancionDAO();
 		String nombre = solicitarCadena("Introduce el nombre de la cancion");
@@ -317,85 +325,172 @@ public class Principal {
 
 	}
 
-	private static void tratarMenuPlaylist(int opc) {
-		switch (opc) {
-		case 1:
-			break;
-		case 2:
-			break;
-		case 3:
-			break;
-		case 4:
-			break;
-		}
+	private static void añadirCanciones() {
+		CancionDAO daoCancion = new CancionDAO();
+		PlaylistDAO daoPlaylist = new PlaylistDAO();
+		System.out.println("Introduce id de la playlist:");
+		Playlist playlist = daoPlaylist.getPlaylist(Integer.parseInt(teclado.nextLine()));
+		System.out.println("Introduce id de la canción: ");
+		Cancion cancion = daoCancion.obtenerCancionPorId(Integer.parseInt(teclado.nextLine()));
+
+		playlist.addCancion(cancion);
+		System.out.println(playlist);
+
+		daoPlaylist.actualizar(playlist);
+
 	}
 
-	private static void tratarMenuActualizaciones(int opc) {
-		int eleccion;
+	private static void tratarMenuCancion(int opc) throws ReproductorException {
 		switch (opc) {
 		case 1:
+			nuevaCancion(); // No guarda artista
 			break;
 		case 2:
-			eleccion = Menus.menuPlaylist();
-			tratarMenuPlaylist(eleccion);
-			break;
-		}
-	}
-
-	private static void tratarMenuBajas(int opc) throws ReproductorException {
-		switch (opc) {
-		case 1:
 			bajaCancion();
 			break;
-		case 2:
-			bajaArtista();
-			break;
 		case 3:
-			bajaAlbum();
-			break;
-		case 4:
-			bajaPlaylist();
+			consultarGenerosMasEscuchados();
 			break;
 		}
 	}
 
-	private static void tratarMenuAltas(int opc) throws ReproductorException {
+	private static void consultarGenerosMasEscuchados() {
+		CancionDAO dao = new CancionDAO();
+		List<Object[]> canciones = dao.obtenerGeneroMasEscuchado();
+
+		for (Object[] o : canciones) {
+			System.out.println(o[0] + "\t" + o[1].toString());
+		}
+
+	}
+
+	private static void cambiarNombreArtista() throws ReproductorException {
+		ArtistaDAO dao = new ArtistaDAO();
+		Artista artista = buscarArtista();
+		artista.cambiarNombre(solicitarCadena("Introduce el nuevo nombre para artista: "));
+		dao.actualizar(artista);
+	}
+
+	/**
+	 * Cuando haya un minimo, no preguntar nombre, sino mostrar lista de todos
+	 * 
+	 * @throws ReproductorException
+	 */
+	private static Artista buscarArtista() throws ReproductorException {
+		ArtistaDAO dao = new ArtistaDAO();
+		String nombre = solicitarCadena("Introduce el nombre del artista: ");
+		List<Artista> artistas = dao.obtenerListaArtistasPorNombre(nombre);
+		int id;
+		Artista artista;
+		if (artistas.size() == 0)
+			throw new ReproductorException("No se ha encontrado coincidencias de artistas con ese nombre.");
+
+		if (artistas.size() == 1) {
+			artista = artistas.get(0);
+		} else {
+			for (Artista a : artistas) {
+				System.out.println(a.getId() + ". " + a.getNombre());
+			}
+			id = solicitarEntero("Introduce del id del artista: ");
+			artista = dao.getArtista(id);
+		}
+
+		return artista;
+	}
+
+	private static Playlist buscarPlaylist() throws ReproductorException {
+		PlaylistDAO dao = new PlaylistDAO();
+		String nombre = solicitarCadena("Introduce el nombre de la playlist:");
+		List<Playlist> playlists = dao.buscarPlaylist(nombre);
+		Playlist playlist;
+		int id;
+
+		if (playlists.size() == 0)
+			throw new ReproductorException("No se ha encontrado coincidencias de artista con ese nombre.");
+
+		if (playlists.size() == 1) {
+			playlist = playlists.get(0);
+
+		} else {
+			for (Playlist p : playlists) {
+				System.out.println(p.getId() + "\t" + p.getNombre());
+			}
+			id = solicitarEntero("Introduce el id de la playlist: ");
+			playlist = dao.getPlaylist(id);
+		}
+		return playlist;
+	}
+
+	private static void cambiarNombrePlaylist() throws ReproductorException {
+		PlaylistDAO dao = new PlaylistDAO();
+		Playlist playlist = buscarPlaylist();
+
+		playlist.cambiarNombre(solicitarCadena("Introduce el nuevo nombre para la playlist: "));
+		dao.actualizar(playlist);
+
+	}
+
+	private static void tratarMenuArtista(int opc) throws ReproductorException {
 		switch (opc) {
 		case 1:
 			nuevoArtista();
 			break;
 		case 2:
-			nuevaCancion(); // No guarda artista
+			bajaArtista();
 			break;
 		case 3:
-			nuevoAlbum();
+			mostrarTodosArtista();
 			break;
 		case 4:
-			nuevaPlaylist();
+			break;
+		case 5:
+			mostrarCancionesArtista();
+			break;
+		case 6:
+			cambiarNombreArtista();
 			break;
 		}
 	}
 
-	private static void tratarMenuConsultas(int opc) {
+	private static void tratarMenuAlbum(int opc) {
 		switch (opc) {
 		case 1:
-			mostrarTodosArtista();
+			nuevoAlbum(); // Sin terminar
 			break;
 		case 2:
-			mostrarTodasPlaylist();
+			bajaAlbum();
 			break;
 		case 3:
 			break;
+		}
+	}
+
+	private static void tratarMenuPlaylist(int opc) throws ReproductorException {
+		switch (opc) {
+		case 1:
+			nuevaPlaylist();
+			break;
+		case 2:
+			bajaPlaylist();
+			break;
+		case 3:
+			cambiarNombrePlaylist();
+			break;
 		case 4:
-			mostrarCancionesArtista();
 			break;
 		case 5:
+			añadirCanciones();
 			break;
 		case 6:
 			break;
 		case 7:
+			mostrarTodasPlaylist();
 			break;
 		case 8:
+			break;
+		case 9:
+			break;
+		case 10:
 			break;
 		}
 	}
@@ -404,20 +499,20 @@ public class Principal {
 		int eleccion;
 		switch (opc) {
 		case 1:
-			eleccion = Menus.menuConsultas();
-			tratarMenuConsultas(eleccion);
+			eleccion = Menus.menuCancion();
+			tratarMenuCancion(eleccion);
 			break;
 		case 2:
-			eleccion = Menus.menuAltas();
-			tratarMenuAltas(eleccion);
+			eleccion = Menus.menuArtistas();
+			tratarMenuArtista(eleccion);
 			break;
 		case 3:
-			eleccion = Menus.menuBajas();
-			tratarMenuBajas(eleccion);
+			eleccion = Menus.menuAlbum();
+			tratarMenuAlbum(eleccion);
 			break;
 		case 4:
-			eleccion = Menus.menuActualizaciones();
-			tratarMenuActualizaciones(eleccion);
+			eleccion = Menus.menuPlaylist();
+			tratarMenuPlaylist(eleccion);
 			break;
 		}
 	}

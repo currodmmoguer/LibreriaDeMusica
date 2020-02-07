@@ -1,10 +1,10 @@
 package modelo;
+import java.io.Serializable;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
 
-import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
@@ -19,11 +19,13 @@ import javax.persistence.ManyToMany;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 
+import org.hibernate.annotations.Cascade;
+import org.hibernate.annotations.CascadeType;
 import org.hibernate.annotations.Type;
 
 @Entity
 @Table(name = "Cancion")
-public class Cancion {
+public class Cancion implements Serializable {
 
 	@Id
 	@Type(type = "integer")
@@ -37,6 +39,7 @@ public class Cancion {
 
 
 	@ManyToMany(mappedBy = "canciones", fetch = FetchType.EAGER)
+	@Cascade(CascadeType.SAVE_UPDATE)
 	private List<Artista> artistas;
 	
 	@ManyToOne
@@ -45,15 +48,16 @@ public class Cancion {
 
 	@Column(name = "Duracion")
 	//@NotNull
-	private LocalTime duración;
+	private LocalTime duracion;
 
 	@Column(name = "Publicacion")
 	//@NotNull
 	private LocalDate publicacion;
 	
-	@ManyToMany
-	@JoinTable(name="PlaylistCancion", joinColumns = {@JoinColumn(name="IdCacion")}, inverseJoinColumns = {@JoinColumn(name="IdPlaylist")})
-	private List<Playlist> playlists;
+//	@ManyToMany
+//	@Cascade(CascadeType.SAVE_UPDATE)
+//	@JoinTable(name="PlaylistCancion", joinColumns = {@JoinColumn(name="IdCancion")}, inverseJoinColumns = {@JoinColumn(name="IdPlaylist")})
+//	private List<Playlist> playlists;
 	
 	@Enumerated(EnumType.STRING)
 	private Genero genero;
@@ -70,7 +74,7 @@ public class Cancion {
 		this.nombre = nombre;
 		this.artistas = artistas;
 		this.album = album;
-		this.duración = duración;
+		this.duracion = duración;
 		this.publicacion = publicacion;
 		this.genero = genero;
 
@@ -101,15 +105,15 @@ public class Cancion {
 	}
 
 	public LocalTime getDuración() {
-		return duración;
+		return duracion;
 	}
 
 	public String mostrarDuracion() {
-		return DateTimeFormatter.ISO_TIME.format(duración);
+		return DateTimeFormatter.ISO_TIME.format(duracion);
 	}
 
 	public void setDuración(LocalTime duración) {
-		this.duración = duración;
+		this.duracion = duración;
 	}
 
 	public LocalDate getPublicacion() {
@@ -155,7 +159,7 @@ public class Cancion {
 	@Override
 	public String toString() {
 		return "Cancion [id=" + id + ", nombre=" + nombre + ", artistas=" + artistas + ", album=" + album
-				+ ", duración=" + duración + ", publicacion=" + publicacion + "]";
+				+ ", duración=" + duracion + ", publicacion=" + publicacion + "]";
 	}
 
 }

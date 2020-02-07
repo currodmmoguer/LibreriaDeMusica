@@ -27,4 +27,17 @@ public class CancionDAO extends GenericDAO<Cancion> {
 		
 		return cancion;
 	}
+	
+	public List<Object[]> obtenerGeneroMasEscuchado(){
+		Session session = HibernateUtil.getSessionFactory().openSession();
+		Query query = session.createQuery("SELECT COUNT(c) as cantidad, c.genero "
+										+ "FROM Cancion c "
+										+ "GROUP BY c.genero "
+										+ "ORDER BY cantidad DESC").setMaxResults(3);
+		List<Object[]> canciones = query.list();
+		
+		session.close();
+		
+		return canciones;
+	}
 }
