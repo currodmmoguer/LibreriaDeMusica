@@ -6,12 +6,13 @@ import modelo.HibernateUtil;
 
 public class GenericDAO<T> {
 	
-	public void guardar(T entidad) {
+	public T guardar(T entidad) {
 		Session session = HibernateUtil.getSessionFactory().openSession();
 		session.beginTransaction();
 		session.save(entidad);
 		session.getTransaction().commit();
 		session.close();
+		return entidad;
 	}
 	
 	public  void borrar(T entidad) {
@@ -29,6 +30,8 @@ public class GenericDAO<T> {
 		session.getTransaction().commit();
 		session.close();
 	}
+	
+
 	
 
 }

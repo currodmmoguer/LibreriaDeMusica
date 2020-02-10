@@ -4,6 +4,7 @@ import java.time.LocalDate;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Scanner;
 
@@ -159,8 +160,9 @@ public class Principal {
 					lista.add(artista);
 				} else {
 					opcion = solicitarSN("El artista " + nombre + " no existe. ¿Deseas crearlo? (S/N)");
-					if (opcion == 'n') {
-						daoArtista.guardar(new Artista(nombre));
+					if (opcion == 'S') {
+						artista = daoArtista.guardar(new Artista(nombre));
+						lista.add(artista);
 					}
 
 				}
@@ -171,25 +173,67 @@ public class Principal {
 		return lista;
 	}
 
-	private static void nuevoAlbum() {
+	/**
+	 * Cuando haya un minimo, no preguntar nombre, sino mostrar lista de todos
+	 * Si el nombre no coincide exactamente con el devuelto avisarlo
+	 * 
+	 * @throws ReproductorException
+	 */
+	private static Artista buscarArtista() throws ReproductorException {
+		ArtistaDAO dao = new ArtistaDAO();
+		String nombre = solicitarCadena("Introduce el nombre del artista: ");
+		List<Artista> artistas = dao.obtenerListaArtistasPorNombre(nombre);
+		int id;
+		Artista artista;
+		if (artistas.size() == 0)
+			throw new ReproductorException("No se ha encontrado coincidencias de artistas con ese nombre.");
+
+		if (artistas.size() == 1) {
+			artista = artistas.get(0);
+		} else {
+			for (Artista a : artistas) {
+				System.out.println(a.getId() + ". " + a.getNombre());
+			}
+			id = solicitarEntero("Introduce del id del artista: ");
+			artista = dao.getArtista(id);
+		}
+
+		return artista;
+	}
+	
+	private static void nuevoAlbum() throws ReproductorException {
 		ArtistaDAO daoArtista = new ArtistaDAO();
 		String nombre = solicitarCadena("Introduce el nombre del album: ");
-		Artista artista = daoArtista.obtenerArtistaPorNombre(solicitarCadena("Introduce el nombre del artista: "));
-		// Comprobar si no existe
-		List<Cancion> canciones = solicitarCanciones(artista);
+		Artista artista = buscarArtista();
+
+		
+		
+		
+		//List<Cancion> canciones = solicitarCanciones(artista);
 
 	}
 
 	private static List<Cancion> solicitarCanciones(Artista artista) {
 		ArrayList<Cancion> canciones = new ArrayList<Cancion>();
-		String nombreCancion;
 		int pos = 1;
+		int opc;
+		
+		do {
+			opc = Menus.menuAddCancionAlbum();
+			tratarMenuAddCancionAlbum(opc);
+		} while (opc != 3);
+		
 		for (Cancion c : artista.getCanciones()) {
 			System.out.println(pos + ". " + c.getNombre());
 		}
 
 		// Hay que preguntar que introduza el numero de cada cancion
 		return null;
+	}
+
+	private static void tratarMenuAddCancionAlbum(int opc) {
+		// TODO Auto-generated method stub
+		
 	}
 
 	private static void nuevaPlaylist() {
@@ -213,20 +257,7 @@ public class Principal {
 
 	}
 
-	/**
-	 * Muesta las canciones de un artista Hay que añadir la opcion de ordenar
-	 * alfabéticamente, por fecha Posibiliad de mostrar si se parecen o no el nombre
-	 * del artista (regex)
-	 */
-	private static void mostrarCancionesArtista() {
-		ArtistaDAO daoArtista = new ArtistaDAO();
-		Artista artista = daoArtista.obtenerArtistaPorNombre(solicitarCadena("Introduce el nombre del artista: "));
-		System.out.println(artista);
-		for (Cancion c : artista.getCanciones()) {
-			System.out.println(c);
-		}
 
-	}
 
 	private static void mostrarTodosArtista() {
 		ArtistaDAO dao = new ArtistaDAO();
@@ -260,7 +291,7 @@ public class Principal {
 			opc = solicitarSN("Seguro que quieres borrar la cancion " + nombre + "? (S/N)");
 
 			if (opc == 'S')
-				dao.borrar(lista.get(0));
+				borrarCancion(lista.get(0));
 
 		} else { // Mas de 1 coincidencia
 			for (Cancion c : lista) { // Muestra todas las canciones
@@ -272,14 +303,102 @@ public class Principal {
 			opc = solicitarSN("Seguro que deseas borrar la canción " + cancion.getNombre() + "? (S/N)");
 
 			if (opc == 'S') {
-				dao.borrar(cancion);
+				borrarCancion(cancion);
+				
 			}
 		}
 
 	}
 
-	private static void bajaArtista() {
+	private static void borrarCancion(Cancion cancion) {
+		CancionDAO daoCancion = new CancionDAO();
+		ArtistaDAO daoArtista = new ArtistaDAO();
+		
+		for(Artista artista: cancion.getArtistas()) {
+			artista.borrarCancion(cancion);
+			daoArtista.actualizar(artista);
+		}
+		cancion.getArtistas().clear();
+		daoCancion.borrar(cancion);
+		
+	}
+	
+	private static void borrarArtista(Artista artista) {
+		ArtistaDAO dao = new ArtistaDAO();
+		Cancion cancion;
+		
+		Iterator<Cancion> it = artista.getCanciones().iterator();
+		while (it.hasNext()) {
+			cancion = it.next();
+			//borrarCancion(cancion);
+		}
+		artista.getCanciones().clear();
 
+		dao.borrar(artista);
+		
+	}
+	/**
+	 * Muesta las canciones de un artista Hay que añadir la opcion de ordenar
+	 * alfabéticamente, por fecha Posibiliad de mostrar si se parecen o no el nombre
+	 * del artista (regex)
+	 * @throws ReproductorException 
+	 */
+	private static void mostrarCancionesArtista() throws ReproductorException {
+		ArtistaDAO daoArtista = new ArtistaDAO();
+		List<Artista> listaArtistas = daoArtista.obtenerListaArtistasPorNombre(solicitarCadena("Introduce el nombre del artista: "));
+		Artista artista;
+		if (listaArtistas.size() == 0)
+			throw new ReproductorException("No se ha encontrado coincidencias.");
+		
+		System.out.println("Canciones:");
+		if (listaArtistas.size() == 1) {
+			for(Cancion c: listaArtistas.get(0).getCanciones()) {
+				System.out.println(c.getNombre());
+			}
+		} else {
+			for(Artista a: listaArtistas) {
+				System.out.println(a.getId() + "\t" + a.getNombre());
+			}
+			System.out.println("Introduce el id del artista que deseas ver sus canciones: ");
+			artista = daoArtista.getArtista(Integer.parseInt(teclado.nextLine()));
+			
+			for (Cancion c: artista.getCanciones()) {
+				System.out.println(c.getNombre());
+			}
+		}
+		
+		
+
+
+	}
+
+	private static void bajaArtista() throws ReproductorException {
+		ArtistaDAO dao = new ArtistaDAO();
+		String nombre = solicitarCadena("Introduce el nombre del artista: ");
+		List<Artista> listaArtista = dao.obtenerListaArtistasPorNombre(nombre);
+		char opc;
+		Artista artista;
+		if (listaArtista.size() == 0)
+			throw new ReproductorException("No se ha encontrado coincidencias.");
+		
+		if (listaArtista.size() == 1) {
+			opc = solicitarSN("Seguro que quieres borrar el artista " + nombre + "? (S/N)");
+			
+			if (opc == 'S') {
+				borrarArtista(listaArtista.get(0));
+			}
+		} else {
+			for(Artista a: listaArtista) {
+				System.out.println(a.getId() + "\t" + a.getNombre());
+			}
+			System.out.println("Introduce el id del artista que deseas eliminar: ");
+			artista = dao.getArtista(Integer.parseInt(teclado.nextLine()));
+			
+			opc = solicitarSN("Seguro que quieres borrar el artista " + nombre + "? (S/N)");
+			if (opc == 'S') {
+				borrarArtista(artista);
+			}
+		}
 	}
 
 	private static void bajaAlbum() {
@@ -325,6 +444,9 @@ public class Principal {
 
 	}
 
+	/**
+	 * Salta excepcion al añadir cuando ya hay alguna (preguntar merge)
+	 */
 	private static void añadirCanciones() {
 		CancionDAO daoCancion = new CancionDAO();
 		PlaylistDAO daoPlaylist = new PlaylistDAO();
@@ -334,25 +456,28 @@ public class Principal {
 		Cancion cancion = daoCancion.obtenerCancionPorId(Integer.parseInt(teclado.nextLine()));
 
 		playlist.addCancion(cancion);
-		System.out.println(playlist);
 
 		daoPlaylist.actualizar(playlist);
 
 	}
-
-	private static void tratarMenuCancion(int opc) throws ReproductorException {
-		switch (opc) {
-		case 1:
-			nuevaCancion(); // No guarda artista
-			break;
-		case 2:
-			bajaCancion();
-			break;
-		case 3:
-			consultarGenerosMasEscuchados();
-			break;
-		}
+	
+	private static void eliminarCancionPlaylist() throws ReproductorException {
+		PlaylistDAO daoPlaylist = new PlaylistDAO();
+		CancionDAO daoCancion = new CancionDAO();
+		Playlist playlist = buscarPlaylist();
+		Cancion cancion;
+		int id;
+		
+		playlist.getCanciones().stream().forEach(c -> System.out.println(c.getId() +"\t"+c.getNombre()));
+		id = solicitarEntero("Introduce el id de la canción que deseas eliminar: ");
+		cancion = daoCancion.obtenerCancionPorId(id);
+		playlist.eliminarCancion(cancion);
+		
+		daoPlaylist.actualizar(playlist);
+		System.out.println("Eliminado correctamente la canción " + cancion.getNombre() + " de " + playlist.getNombre());
 	}
+
+
 
 	private static void consultarGenerosMasEscuchados() {
 		CancionDAO dao = new CancionDAO();
@@ -371,33 +496,15 @@ public class Principal {
 		dao.actualizar(artista);
 	}
 
+
+
 	/**
-	 * Cuando haya un minimo, no preguntar nombre, sino mostrar lista de todos
-	 * 
+	 * Si coincide el regex pero no el nombre y solo hay 1 lo pilla
+	 * tiene que comprobar que el nombre sea exacatemente igual
+	 * ej: ppp, si pongo p y no hay mas me la coje directamente esa
+	 * @return
 	 * @throws ReproductorException
 	 */
-	private static Artista buscarArtista() throws ReproductorException {
-		ArtistaDAO dao = new ArtistaDAO();
-		String nombre = solicitarCadena("Introduce el nombre del artista: ");
-		List<Artista> artistas = dao.obtenerListaArtistasPorNombre(nombre);
-		int id;
-		Artista artista;
-		if (artistas.size() == 0)
-			throw new ReproductorException("No se ha encontrado coincidencias de artistas con ese nombre.");
-
-		if (artistas.size() == 1) {
-			artista = artistas.get(0);
-		} else {
-			for (Artista a : artistas) {
-				System.out.println(a.getId() + ". " + a.getNombre());
-			}
-			id = solicitarEntero("Introduce del id del artista: ");
-			artista = dao.getArtista(id);
-		}
-
-		return artista;
-	}
-
 	private static Playlist buscarPlaylist() throws ReproductorException {
 		PlaylistDAO dao = new PlaylistDAO();
 		String nombre = solicitarCadena("Introduce el nombre de la playlist:");
@@ -420,14 +527,52 @@ public class Principal {
 		}
 		return playlist;
 	}
+	
+	private static void consultarPlaylist() throws ReproductorException {
+		StringBuilder sb = new StringBuilder();
+		Playlist playlist = buscarPlaylist();
+		
+		for (Cancion c : playlist.getCanciones()) {
+			sb.append(c.getNombre() + " - ");
+			for (Artista a : c.getArtistas()) {
+				sb.append(a.getNombre() + ", ");
+			}
+			sb.delete(sb.length() - 2, sb.length()); //Quita la ultima ,
+			sb.append("\n");
+		}
+		System.out.println(playlist.getNombre() + "\n" + playlist.getDescripcion());
+		System.out.println("Total canciones: " + playlist.getCanciones().size() + "\tDuración: " + playlist.getDuracion());
+		System.out.println(sb.toString());
+		
+	}
 
 	private static void cambiarNombrePlaylist() throws ReproductorException {
 		PlaylistDAO dao = new PlaylistDAO();
 		Playlist playlist = buscarPlaylist();
-
 		playlist.cambiarNombre(solicitarCadena("Introduce el nuevo nombre para la playlist: "));
 		dao.actualizar(playlist);
-
+	}
+	
+	
+	private static void cambiarDescripcionPlaylist() throws ReproductorException {
+		PlaylistDAO dao = new PlaylistDAO();
+		Playlist playlist = buscarPlaylist();
+		playlist.cambiarDescripcion(solicitarCadena("Introduce la nueva descripción para la playlist: "));
+		dao.actualizar(playlist);
+	}
+	
+	private static void tratarMenuCancion(int opc) throws ReproductorException {
+		switch (opc) {
+		case 1:
+			nuevaCancion(); // No guarda artista
+			break;
+		case 2:
+			bajaCancion();
+			break;
+		case 3:
+			consultarGenerosMasEscuchados();
+			break;
+		}
 	}
 
 	private static void tratarMenuArtista(int opc) throws ReproductorException {
@@ -436,12 +581,13 @@ public class Principal {
 			nuevoArtista();
 			break;
 		case 2:
-			bajaArtista();
+			bajaArtista(); //Sin hacer
 			break;
 		case 3:
 			mostrarTodosArtista();
 			break;
 		case 4:
+			
 			break;
 		case 5:
 			mostrarCancionesArtista();
@@ -452,7 +598,9 @@ public class Principal {
 		}
 	}
 
-	private static void tratarMenuAlbum(int opc) {
+
+
+	private static void tratarMenuAlbum(int opc) throws ReproductorException {
 		switch (opc) {
 		case 1:
 			nuevoAlbum(); // Sin terminar
@@ -477,16 +625,19 @@ public class Principal {
 			cambiarNombrePlaylist();
 			break;
 		case 4:
+			cambiarDescripcionPlaylist();
 			break;
 		case 5:
 			añadirCanciones();
 			break;
 		case 6:
+			eliminarCancionPlaylist();
 			break;
 		case 7:
 			mostrarTodasPlaylist();
 			break;
 		case 8:
+			consultarPlaylist();
 			break;
 		case 9:
 			break;
@@ -494,6 +645,12 @@ public class Principal {
 			break;
 		}
 	}
+
+
+
+
+
+
 
 	private static void tratarMenuPrincipal(int opc) throws ReproductorException {
 		int eleccion;

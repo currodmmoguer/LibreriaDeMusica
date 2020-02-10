@@ -1,5 +1,6 @@
 package modelo;
 import java.io.Serializable;
+import java.time.LocalTime;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -20,6 +21,7 @@ import org.hibernate.annotations.CascadeType;
 import org.hibernate.annotations.Fetch;
 import org.hibernate.annotations.FetchMode;
 import org.hibernate.annotations.Type;
+import org.hibernate.validator.constraints.NotBlank;
 
 @Entity
 @Table(name="Playlist")
@@ -32,7 +34,7 @@ public class Playlist implements Serializable{
 	private int id;
 	
 	@Column(name="Nombre")
-	//@NotBlank
+	@NotBlank
 	private String nombre;
 	
 	@Column(name="Descripcion")
@@ -91,7 +93,6 @@ public class Playlist implements Serializable{
 		boolean contiene = true;
 		LinkedList<Cancion> canciones = convertirALinked();
 		if (!canciones.contains(cancion)) {
-			System.out.println("No contiene");
 			canciones.push(cancion);
 			contiene = false;
 		}
@@ -100,6 +101,19 @@ public class Playlist implements Serializable{
 		this.canciones = canciones;
 		
 		return contiene;
+	}
+	
+	public boolean eliminarCancion(Cancion cancion) {
+		boolean encontrada = false;
+		int contador = 0;
+		while (!encontrada && contador < canciones.size()) {
+			if (canciones.get(contador).equals(cancion)) {
+				encontrada = true;
+				canciones.remove(contador);
+			}
+			contador++;
+		}
+		return encontrada;
 	}
 	
 	public void cambiarNombre(String nombre) throws ReproductorException {
@@ -126,26 +140,24 @@ public class Playlist implements Serializable{
 		return lista;
 	}
 	
-	public void borrarCancion(int i) {
-		this.canciones.remove(i);
-	}
+
 
 	public int getId() {
 		return id;
 	}
 	
-//	public LocalTime getDuracion() {
-//		LocalTime tiempo = LocalTime.of(0, 0, 0);
-//		int horas, minutos, segundos;
-//		for (Cancion cancion : canciones) {
-//			horas = cancion.getDuración().getHour();
-//			minutos = cancion.getDuración().getMinute();
-//			segundos = cancion.getDuración().getSecond();
-//			tiempo = tiempo.plusHours(horas).plusMinutes(minutos).plusSeconds(segundos);
-//		}
-//		
-//		return tiempo;
-//	}
+	public LocalTime getDuracion() {
+		LocalTime tiempo = LocalTime.of(0, 0, 0);
+		int horas, minutos, segundos;
+		for (Cancion cancion : canciones) {
+			horas = cancion.getDuración().getHour();
+			minutos = cancion.getDuración().getMinute();
+			segundos = cancion.getDuración().getSecond();
+			tiempo = tiempo.plusHours(horas).plusMinutes(minutos).plusSeconds(segundos);
+		}
+		
+		return tiempo;
+	}
 
 	@Override
 	public int hashCode() {

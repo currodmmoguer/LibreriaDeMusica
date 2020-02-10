@@ -19,6 +19,7 @@ import javax.persistence.OneToMany;
 import javax.persistence.Table;
 
 import org.hibernate.annotations.Cascade;
+import org.hibernate.annotations.ForeignKey;
 import org.hibernate.annotations.IndexColumn;
 import org.hibernate.annotations.Type;
 
@@ -84,6 +85,10 @@ public class Artista implements Serializable {
 		
 		this.setNombre(nombre);
 		System.out.println("Se ha modificado el nombre correctamente.");
+	}
+	
+	public void borrarCancion(Cancion cancion) {
+		canciones.remove(cancion);
 	}
 
 	@Override

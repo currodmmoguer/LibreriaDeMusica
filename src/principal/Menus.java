@@ -82,7 +82,7 @@ public class Menus {
 		System.out.println("3. Cambiar nombre");
 		System.out.println("4. Cambiar descripcion");
 		System.out.println("5. Añadir canciones");
-		System.out.println("6. Eliminar canciones");
+		System.out.println("6. Eliminar cancion");
 		System.out.println("7. Consultar todas las playlist");
 		System.out.println("8. Consultar playlist");
 		System.out.println("9. Consultar playlist que contengan una canción");
@@ -94,6 +94,21 @@ public class Menus {
 			opc = Integer.parseInt(teclado.nextLine());
 		} while (opc < 1 || opc > 11);
 
+		return opc;
+	}
+	
+	protected static int menuAddCancionAlbum() {
+		int opc;
+		
+		System.out.println("1. Elegir cancion existente");
+		System.out.println("2. Añadir canción nueva");
+		System.out.println("3. Terminar");
+		
+		do {
+			System.out.println("Introduce una opción: ");
+			opc = Integer.parseInt(teclado.nextLine());
+		} while (opc < 1 || opc > 3);
+		
 		return opc;
 	}
 

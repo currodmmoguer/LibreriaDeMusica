@@ -18,10 +18,12 @@ import javax.persistence.JoinTable;
 import javax.persistence.ManyToMany;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
+import javax.validation.constraints.NotNull;
 
 import org.hibernate.annotations.Cascade;
 import org.hibernate.annotations.CascadeType;
 import org.hibernate.annotations.Type;
+import org.hibernate.validator.constraints.NotBlank;
 
 @Entity
 @Table(name = "Cancion")
@@ -34,7 +36,7 @@ public class Cancion implements Serializable {
 	private int id;
 	
 	@Column(name = "Nombre")
-	//@NotBlank
+	@NotBlank
 	private String nombre;
 
 
@@ -47,11 +49,11 @@ public class Cancion implements Serializable {
 	private Album album;
 
 	@Column(name = "Duracion")
-	//@NotNull
+	@NotNull
 	private LocalTime duracion;
 
 	@Column(name = "Publicacion")
-	//@NotNull
+	@NotNull
 	private LocalDate publicacion;
 	
 //	@ManyToMany
