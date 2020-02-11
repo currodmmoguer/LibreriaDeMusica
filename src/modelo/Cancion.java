@@ -22,6 +22,8 @@ import javax.validation.constraints.NotNull;
 
 import org.hibernate.annotations.Cascade;
 import org.hibernate.annotations.CascadeType;
+import org.hibernate.annotations.Fetch;
+import org.hibernate.annotations.FetchMode;
 import org.hibernate.annotations.Type;
 import org.hibernate.validator.constraints.NotBlank;
 
@@ -56,10 +58,11 @@ public class Cancion implements Serializable {
 	@NotNull
 	private LocalDate publicacion;
 	
-//	@ManyToMany
-//	@Cascade(CascadeType.SAVE_UPDATE)
-//	@JoinTable(name="PlaylistCancion", joinColumns = {@JoinColumn(name="IdCancion")}, inverseJoinColumns = {@JoinColumn(name="IdPlaylist")})
-//	private List<Playlist> playlists;
+	@ManyToMany(fetch = FetchType.LAZY)
+	@Cascade(CascadeType.SAVE_UPDATE)
+
+	@JoinTable(name="PlaylistCancion", joinColumns = {@JoinColumn(name="IdCancion")}, inverseJoinColumns = {@JoinColumn(name="IdPlaylist")})
+	private List<Playlist> playlists;
 	
 	@Enumerated(EnumType.STRING)
 	private Genero genero;
@@ -80,6 +83,14 @@ public class Cancion implements Serializable {
 		this.publicacion = publicacion;
 		this.genero = genero;
 
+	}
+
+	public Cancion(String nombre, List<Artista> listaArtistas, LocalTime duracion, Genero genero) {
+		
+		this.nombre = nombre;
+		this.artistas = listaArtistas;
+		this.duracion = duracion;
+		this.genero = genero;
 	}
 
 	public String getNombre() {
@@ -134,6 +145,18 @@ public class Cancion implements Serializable {
 		return id;
 	}
 	
+	public String getNombreConArtistas() {
+		StringBuilder sb = new StringBuilder(nombre + " - ");
+		for(Artista a: artistas) {
+			sb.append(a.getNombre() +", ");
+		}
+		sb.delete(sb.length() - 2, sb.length()); // Quita la ultima ,
+		sb.append("\n");
+		
+		return sb.toString();
+	}
+	
+
 
 
 	@Override

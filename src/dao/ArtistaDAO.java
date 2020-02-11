@@ -46,6 +46,8 @@ public class ArtistaDAO extends GenericDAO<Artista>{
 		return existe;
 	}
 	
+	
+	
 	public List<Artista> consultarArtistas(){
 		List<Artista> lista;
 		Session session = HibernateUtil.getSessionFactory().openSession();

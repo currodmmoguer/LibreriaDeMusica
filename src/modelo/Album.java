@@ -6,14 +6,21 @@ import java.util.List;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
+import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Size;
 
+import org.hibernate.annotations.Cascade;
+import org.hibernate.annotations.CascadeType;
 import org.hibernate.annotations.Type;
+import org.hibernate.validator.constraints.NotBlank;
 
 @Entity
 @Table(name="Album")
@@ -27,27 +34,29 @@ public class Album implements Serializable{
 	
 	
 	@Column(name="Nombre")
-	//@NotBlank
+	@NotBlank
 	private String nombre;
 	
-	@Column(name="IdArtista")
-	@Type(type="integer")
-	//@NotNull
+	@ManyToOne
+	@JoinColumn(name="IdArtista")
+	//@Type(type="integer")
+	@NotNull
 	private Artista artista;
 	
-	@OneToMany
+	@OneToMany(fetch = FetchType.EAGER)
 	@JoinColumn(name="IdAlbum")
+	@Cascade(CascadeType.SAVE_UPDATE)
 	//@IndexColumn(name="idx")
-	//@Size(min=1)
+	@Size(min=1)
 	private List<Cancion> canciones;
 	
 	@Column(name="Publicacion")
-	//@NotNull
+	@NotNull
 	private LocalDate lanzamiento;
 	
 	public Album() {}
 	
-	public Album(String nombre, Artista artista, LinkedList<Cancion> canciones, LocalDate publicacion) {
+	public Album(String nombre, Artista artista, List<Cancion> canciones, LocalDate publicacion) {
 		super();
 		this.nombre = nombre;
 		this.artista = artista;

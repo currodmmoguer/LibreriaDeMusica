@@ -25,7 +25,7 @@ public class AlbumDAO extends GenericDAO<Album> {
 	
 	public List<Album> obtenerListaAlbumPorNombre(String nombre){
 		Session session = HibernateUtil.getSessionFactory().openSession();
-		Query query = session.createQuery("SELECT a FROM Album a WHERE Nombre='"+nombre+"'");
+		Query query = session.createQuery("SELECT a FROM Album a WHERE Nombre LIKE'%"+nombre+"%'");
 		List<Album> albunes = query.list();
 		session.close();
 		return albunes;

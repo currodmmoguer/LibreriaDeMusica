@@ -22,6 +22,7 @@ import org.hibernate.annotations.Cascade;
 import org.hibernate.annotations.ForeignKey;
 import org.hibernate.annotations.IndexColumn;
 import org.hibernate.annotations.Type;
+import org.hibernate.validator.constraints.NotBlank;
 
 @Entity
 @Table(name="Artista")
@@ -34,12 +35,13 @@ public class Artista implements Serializable {
 	private int id;
 	
 	@Column(name="Nombre")
-	//@NotBlank
+	@NotBlank
 	private String nombre;
 	
 	@OneToMany
+	@Cascade(org.hibernate.annotations.CascadeType.SAVE_UPDATE)
 	@JoinColumn(name="IdArtista")
-	@IndexColumn(name="idx")
+	//@IndexColumn(name="idx")
 	private List<Album> albunes;
 	
 	@ManyToMany(fetch = FetchType.EAGER)

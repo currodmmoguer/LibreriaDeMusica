@@ -1,10 +1,12 @@
 package dao;
 
+import java.util.LinkedList;
 import java.util.List;
 
 import org.hibernate.Query;
 import org.hibernate.Session;
 
+import modelo.Artista;
 import modelo.Cancion;
 import modelo.HibernateUtil;
 
@@ -13,7 +15,7 @@ public class CancionDAO extends GenericDAO<Cancion> {
 	public List<Cancion> obtenerCancionPorNombre(String nombre) {
 		Session session = HibernateUtil.getSessionFactory().openSession();
 		
-		Query query = session.createQuery("SELECT c FROM Cancion c WHERE Nombre='" + nombre + "'");
+		Query query = session.createQuery("SELECT c FROM Cancion c WHERE Nombre LIKE'%" + nombre + "%'");
 		List<Cancion> lista = query.list();
 		session.close();
 		
@@ -39,5 +41,17 @@ public class CancionDAO extends GenericDAO<Cancion> {
 		session.close();
 		
 		return canciones;
+	}
+	
+	public List<Cancion> obtenerCancionesDeUnArtista(Artista artista){
+		String hql = "SELECT c FROM Cancion c "
+				+ "JOIN c.artistas a "
+				+ "WHERE a.id = " + artista.getId()
+				+ " AND c.album is null";
+		Session session = HibernateUtil.getSessionFactory().openSession();
+		Query query = session.createQuery(hql);
+		List<Cancion> lista = query.list();
+		session.close();
+		return lista;
 	}
 }
