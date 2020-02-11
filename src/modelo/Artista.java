@@ -5,7 +5,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 
-import javax.persistence.CascadeType;
+
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
@@ -19,8 +19,7 @@ import javax.persistence.OneToMany;
 import javax.persistence.Table;
 
 import org.hibernate.annotations.Cascade;
-import org.hibernate.annotations.ForeignKey;
-import org.hibernate.annotations.IndexColumn;
+import org.hibernate.annotations.CascadeType;
 import org.hibernate.annotations.Type;
 import org.hibernate.validator.constraints.NotBlank;
 
@@ -38,14 +37,14 @@ public class Artista implements Serializable {
 	@NotBlank
 	private String nombre;
 	
-	@OneToMany
-	@Cascade(org.hibernate.annotations.CascadeType.SAVE_UPDATE)
+	@OneToMany(fetch = FetchType.EAGER)
+	@Cascade(CascadeType.SAVE_UPDATE)
 	@JoinColumn(name="IdArtista")
 	//@IndexColumn(name="idx")
-	private List<Album> albunes;
+	private Set<Album> albunes;
 	
 	@ManyToMany(fetch = FetchType.EAGER)
-	@Cascade(org.hibernate.annotations.CascadeType.SAVE_UPDATE)
+	@Cascade(CascadeType.SAVE_UPDATE)
 	@JoinTable(name="ArtistaCancion", joinColumns = {@JoinColumn(name="IdArtista")}, inverseJoinColumns = {@JoinColumn(name="IdCancion")})
 	private Set<Cancion> canciones;
 	
@@ -81,6 +80,10 @@ public class Artista implements Serializable {
 		return canciones;
 	}
 	
+	public Set<Album> getAlbunes(){
+		return this.albunes;
+	}
+	
 	public void cambiarNombre(String nombre) throws ReproductorException {
 		if (nombre == null || nombre.length() == 0)
 			throw new ReproductorException("No puedes dejar el nombre vacío.");
@@ -91,6 +94,10 @@ public class Artista implements Serializable {
 	
 	public void borrarCancion(Cancion cancion) {
 		canciones.remove(cancion);
+	}
+	
+	public void addAlbum(Album album) {
+		this.albunes.add(album);
 	}
 
 	@Override

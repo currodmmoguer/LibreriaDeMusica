@@ -43,7 +43,7 @@ public class CancionDAO extends GenericDAO<Cancion> {
 		return canciones;
 	}
 	
-	public List<Cancion> obtenerCancionesDeUnArtista(Artista artista){
+	public List<Cancion> obtenerCancionesDeUnArtistaSinAlbum(Artista artista){
 		String hql = "SELECT c FROM Cancion c "
 				+ "JOIN c.artistas a "
 				+ "WHERE a.id = " + artista.getId()

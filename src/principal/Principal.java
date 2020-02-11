@@ -3,11 +3,15 @@ package principal;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeParseException;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Scanner;
+
+import org.hibernate.Session;
+
 import dao.AlbumDAO;
 import dao.ArtistaDAO;
 import dao.CancionDAO;
@@ -52,22 +56,25 @@ public class Principal {
 	}
 
 //Artista
-	private static void nuevoArtista() throws ReproductorException {
-		crearArtista();
-
-	}
-
-	private static void crearArtista() throws ReproductorException {
+	/**
+	 * Da de alta en la base de datos un nuevo artista
+	 * 
+	 * @throws ReproductorException en caso de que ya exista un artista con ese
+	 *                              nombre
+	 */
+	private static void altaArtista() throws ReproductorException {
 		String nombre = Util.solicitarCadena("Introduce el nombre del artista: ");
 		ArtistaDAO dao = new ArtistaDAO();
-		if (dao.obtenerArtistaPorNombre(nombre) != null)
+
+		if (dao.obtenerArtistaPorNombre(nombre) != null) // Comprueba si existe un artista con dicho nombre
 			throw new ReproductorException("Ya existe un artista con nombre " + nombre);
 
-		Artista artista = new Artista(nombre);
-		dao.guardar(artista);
-
+		dao.guardar(new Artista(nombre));
 	}
-	
+
+	/**
+	 * Muestra por consola todos los artistas de la base de datos
+	 */
 	private static void mostrarTodosArtista() {
 		ArtistaDAO dao = new ArtistaDAO();
 		List<Artista> artistas = dao.consultarArtistas();
@@ -81,34 +88,50 @@ public class Principal {
 		}
 
 	}
-	
-	private static void borrarArtista(Artista artista) {
+
+	/**
+	 * Borra un artista de la base de datos. No borra sus canciones. --Poder
+	 * preguntarlo
+	 * 
+	 * @throws ReproductorException
+	 */
+	private static void bajaArtista() throws ReproductorException {
 		ArtistaDAO dao = new ArtistaDAO();
-		Cancion cancion;
+		Artista artista = buscarArtista();
+		char opc = Util.solicitarSN("Seguro que quieres borrar el artista " + artista.getNombre() + "? (S/N)");
 
-		Iterator<Cancion> it = artista.getCanciones().iterator();
-		while (it.hasNext()) {
-			cancion = it.next();
-			// borrarCancion(cancion);
-		}
-		artista.getCanciones().clear();
-
-		dao.borrar(artista);
-
+		if (opc == 'S')
+			dao.borrar(artista);
 	}
-	
+
+//	private static void borrarArtista(Artista artista) {
+//	ArtistaDAO dao = new ArtistaDAO();
+//	Cancion cancion;
+//
+//	Iterator<Cancion> it = artista.getCanciones().iterator();
+//	while (it.hasNext()) {
+//		cancion = it.next();
+//		// borrarCancion(cancion);
+//	}
+//	artista.getCanciones().clear();
+//
+//	dao.borrar(artista);
+//
+//}
+//
+
 	/**
 	 * Muesta las canciones de un artista Hay que añadir la opcion de ordenar
-	 * alfabéticamente, por fecha Posibiliad de mostrar si se parecen o no el nombre
-	 * del artista (regex)
+	 * alfabéticamente, por fecha
 	 * 
 	 * @throws ReproductorException
 	 */
 	private static void mostrarCancionesArtista() throws ReproductorException {
 		ArtistaDAO daoArtista = new ArtistaDAO();
-		List<Artista> listaArtistas = daoArtista
-				.obtenerListaArtistasPorNombre(Util.solicitarCadena("Introduce el nombre del artista: "));
 		Artista artista = buscarArtista();
+
+		if (artista.getCanciones().size() == 0)
+			throw new ReproductorException("El artista " + artista.getNombre() + " aun no tiene canciones.");
 
 		for (Cancion c : artista.getCanciones()) {
 			System.out.println(c.getNombre());
@@ -116,91 +139,60 @@ public class Principal {
 
 	}
 
-	private static void bajaArtista() throws ReproductorException {
-		ArtistaDAO dao = new ArtistaDAO();
-		String nombre = Util.solicitarCadena("Introduce el nombre del artista: ");
-
-		char opc;
-		Artista artista = buscarArtista();
-
-		opc = Util.solicitarSN("Seguro que quieres borrar el artista " + nombre + "? (S/N)");
-
-		if (opc == 'S') {
-			borrarArtista(artista);
-		}
-
-	}
-
 //Cancion
 
-	private static void nuevaCancion() throws ReproductorException {
-		CancionDAO dao = new CancionDAO();
-		Cancion cancion = crearObjetoCancion();
-		dao.guardar(cancion);
-
-	}
-	
 	/**
-	 * No deja borrarlo
+	 * Inserta una nueva canción en la base de datos
 	 * 
 	 * @throws ReproductorException
+	 */
+	private static void altaCancion() throws ReproductorException {
+		CancionDAO dao = new CancionDAO();
+		dao.guardar(crearObjetoCancion());
+	}
+
+	/**
+	 * Borra la canción de la base de datos
+	 * 
+	 * @throws ReproductorException en caso de que no encuentre la canción
 	 */
 	private static void bajaCancion() throws ReproductorException {
-		CancionDAO dao = new CancionDAO();
-		String nombre = Util.solicitarCadena("Introduce el nombre de la cancion");
-		char opc;
-		List<Cancion> lista = dao.obtenerCancionPorNombre(nombre);
-		Cancion cancion = buscarCancion();
-
-		opc = Util.solicitarSN("Seguro que deseas borrar la canción " + cancion.getNombre() + "? (S/N)");
-
-		if (opc == 'S') {
-			borrarCancion(cancion);
-
-		}
-
-	}
-	
-	private static void borrarCancion(Cancion cancion) {
 		CancionDAO daoCancion = new CancionDAO();
 		ArtistaDAO daoArtista = new ArtistaDAO();
+		Cancion cancion = buscarCancion();
+		char opc = Util.solicitarSN("Seguro que deseas borrar la canción " + cancion.getNombre() + "? (S/N)");
 
-		for (Artista artista : cancion.getArtistas()) {
-			artista.borrarCancion(cancion);
-			daoArtista.actualizar(artista);
+		if (opc == 'S') {
+			// Por cada artista tiene que borrar dicha canción de su lista
+			// ya que es una relacio N:M y si no daría fallo por las constricciones
+			for (Artista artista : cancion.getArtistas()) {
+				artista.borrarCancion(cancion);
+				daoArtista.actualizar(artista); // Tiene que actualizarlo en la base de datos
+			}
+			cancion.getArtistas().clear(); // Vacía su lista de artistas
+			daoCancion.borrar(cancion);
 		}
-		cancion.getArtistas().clear();
-		daoCancion.borrar(cancion);
-
 	}
-	
+
 	/**
-	 * Salta excepcion al añadir cuando ya hay alguna (preguntar merge)
+	 * Crea un objeto Cancion solicitando los datos por consola
 	 * 
+	 * @return canción
 	 * @throws ReproductorException
 	 */
-	private static void añadirCanciones() throws ReproductorException {
-		CancionDAO daoCancion = new CancionDAO();
-		PlaylistDAO daoPlaylist = new PlaylistDAO();
-		Playlist playlist = buscarPlaylist();
-		Cancion cancion = buscarCancion();
-
-		playlist.addCancion(cancion);
-
-		daoPlaylist.actualizar(playlist);
-
-	}
-
 	private static Cancion crearObjetoCancion() throws ReproductorException {
-
-		String nombre = Util.solicitarCadena("Introduce el nombre de la cancion");
+		String nombre = Util.solicitarCadena("Introduce el nombre de la cancion: ");
 		ArrayList<Artista> artistas = solicitarArtistasCancion();
 
+		// Comprobar si algun artista tiene esa cancion ya creada
 		Album album = solicitarAlbum();
 		LocalTime duracion = solicitarDuracion();
 		LocalDate publicacion = solicitarPublicacion();
 		Genero genero = solicitarGenero();
 		Cancion cancion = new Cancion(nombre, artistas, album, duracion, publicacion, genero);
+
+		// Al ser una relación N:M hay que añadir a cada artista la canción creada a su
+		// lista de canciones
 		for (Artista a : artistas) {
 			a.getCanciones().add(cancion);
 		}
@@ -208,17 +200,95 @@ public class Principal {
 		return cancion;
 	}
 
+	/**
+	 * Crea un objeto canción para añadir a un album. La diferencia con el anterior
+	 * es que no solicita ni album ni fecha de publicación.
+	 * 
+	 * @param a
+	 * @return
+	 * @throws ReproductorException
+	 */
 	private static Cancion crearObjetoCancionParaAlbum(Artista a) throws ReproductorException {
 
 		String nombre = Util.solicitarCadena("Introduce el nombre de la cancion");
 		List<Artista> listaArtistas = new ArrayList<Artista>();
 		listaArtistas.add(a);
-		// Album album = solicitarAlbum();
 		LocalTime duracion = solicitarDuracion();
-		// LocalDate publicacion = solicitarPublicacion();
 		Genero genero = solicitarGenero();
 		Cancion cancion = new Cancion(nombre, listaArtistas, duracion, genero);
 		return cancion;
+	}
+
+	/**
+	 * Muestra los 3 generos mas escuchados de todas las canciones de la base de
+	 * datos-
+	 */
+	private static void consultarGenerosMasEscuchados() {
+		CancionDAO dao = new CancionDAO();
+		List<Object[]> canciones = dao.obtenerGeneroMasEscuchado();
+		int pos = 1;
+
+		for (Object[] o : canciones) {
+			if ((long) o[0] == 1) // Controla el singular y plural
+				System.out.println(pos + ". " + o[1].toString() + " con una canción");
+			else
+				System.out.println(pos + ". " + o[1].toString() + " con " + o[0] + " canciones");
+			pos++;
+		}
+
+	}
+
+// Album
+	/**
+	 * 
+	 * @throws ReproductorException
+	 */
+	private static void altaAlbum() throws ReproductorException {
+		AlbumDAO daoAlbum = new AlbumDAO();
+
+		String nombre = Util.solicitarCadena("Introduce el nombre del album: ");
+		Artista artista = buscarArtista();
+
+		List<Cancion> canciones = solicitarCanciones(artista);
+		LocalDate publicacion = solicitarPublicacion();
+		Album album = new Album(nombre, artista, canciones, publicacion);
+		Session session = HibernateUtil.getSessionFactory().openSession();
+		for (Cancion c : album.getCanciones()) { // Añade la publicacion y el album a cada cancion del album
+			if (c.getPublicacion() == null)
+				c.setPublicacion(album.getPublicacion());
+			c.setAlbum(album);
+			session.evict(c);
+		}
+		session.close();
+
+		// artista.getAlbunes().add(album);
+//		artista.addAlbum(album);
+		daoAlbum.guardar(album);
+
+	}
+	
+	/**
+	 * Borra un album de la base de datos
+	 */
+	private static void bajaAlbum() {
+		AlbumDAO dao = new AlbumDAO();
+		String nombre = Util.solicitarCadena("Introduce el nombre del album: ");
+		List<Album> albunes = dao.obtenerListaAlbumPorNombre(nombre);
+		albunes.stream().forEach(album -> System.out.println(album.getId() + "\t" + album.getNombre()));
+		int id = Util.solicitarEntero("Introduce el id del album que deseas borrar:");
+		// Preguntar si deseas borrar las canciones o no
+		dao.borrar(dao.consultarAlbum(id));
+	}
+	
+	private static void consultarAlbum() throws ReproductorException {
+		Album album = buscarAlbum();
+		System.out.println(
+				album.getNombre() + ", " + album.getArtista().getNombre() + " (" + album.getPublicacion() + ")");
+		int pos = 1;
+		for (Cancion cancion : album.getCanciones()) {
+			System.out.println(pos + ". " + cancion.getNombre());
+			pos++;
+		}
 	}
 
 	private static Genero solicitarGenero() {
@@ -237,17 +307,38 @@ public class Principal {
 
 	private static LocalDate solicitarPublicacion() {
 		DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
-		LocalDate publicacion;
-		String str = Util.solicitarCadena("Introduce la fecha de publicación (DD/MM/AAAA)");
-		publicacion = LocalDate.parse(str, formatter);
+		LocalDate publicacion = null;
+		boolean correcto;
+
+		do {
+			try {
+				String str = Util.solicitarCadena("Introduce la fecha de publicación (DD/MM/AAAA)");
+				publicacion = LocalDate.parse(str, formatter);
+				correcto = true;
+			} catch (DateTimeParseException e) {
+				System.out.println("Error. Debes introducir la fecha en formato DD/MM/AAAA. Vuelve a intentarlo");
+				correcto = false;
+			}
+		} while (!correcto);
 		return publicacion;
 	}
 
 	private static LocalTime solicitarDuracion() {
-		LocalTime duracion;
-		String str = Util.solicitarCadena("Introduce la duración de la canción (MM:SS): ");
-		duracion = LocalTime.parse(str);
+		LocalTime duracion = null;
+		boolean correcto;
+		do {
+			try {
+				String str = Util.solicitarCadena("Introduce la duración de la canción (MM:SS): ");
+				duracion = LocalTime.parse(str);
+				correcto = true;
+			} catch (DateTimeParseException e) {
+				System.out.println("Error. Debes introducir la hora en formato MM:SS. Vuelve a intentarlo.");
+				correcto = false;
+			}
+		} while (!correcto);
+
 		return duracion;
+
 	}
 
 	private static Album solicitarAlbum() {
@@ -268,12 +359,12 @@ public class Principal {
 		Artista artista;
 		char opcion;
 
-		System.out.println("Introduce el/los artista/s de la cancion. Pulsa intro para terminar.");
+		System.out.println("Introduce el/los artista/s de la cancion. ");
 		do {
-			nombre = Util.solicitarCadena("Introduce el nombre del artista");
+			nombre = Util.solicitarCadena("Introduce el nombre del artista. Pulsa intro para terminar.");
 			if (!nombre.equals("")) {
 				artista = daoArtista.obtenerArtistaPorNombre(nombre);
-				System.out.println("Artista-> " + artista);
+
 				if (artista != null) {
 					lista.add(artista);
 				} else {
@@ -291,68 +382,82 @@ public class Principal {
 		return lista;
 	}
 
-	private static void nuevoAlbum() throws ReproductorException {
-		AlbumDAO daoAlbum = new AlbumDAO();
-
-		String nombre = Util.solicitarCadena("Introduce el nombre del album: ");
-		Artista artista = buscarArtista();
-
-		List<Cancion> canciones = solicitarCanciones(artista);
-		LocalDate publicacion = solicitarPublicacion();
-		Album album = new Album(nombre, artista, canciones, publicacion);
-
-		for (Cancion c : album.getCanciones()) { // Añade la publicacion y el album a cada cancion del album
-			if (c.getPublicacion() == null)
-				c.setPublicacion(album.getPublicacion());
-			c.setAlbum(album);
-		}
-
-		daoAlbum.guardar(album);
-
-	}
-
+	/**
+	 * Solicita las canciones para añadirlas a un album
+	 * 
+	 * @param artista
+	 * @return
+	 * @throws ReproductorException
+	 */
 	private static List<Cancion> solicitarCanciones(Artista artista) throws ReproductorException {
 		CancionDAO daoCancion = new CancionDAO();
 		List<Cancion> canciones = new LinkedList<Cancion>();
-		List<Cancion> cancionesExistentes = daoCancion.obtenerCancionesDeUnArtista(artista);
+		List<Cancion> cancionesExistentes = daoCancion.obtenerCancionesDeUnArtistaSinAlbum(artista);
 		char opc;
 		int id;
 		Cancion cancion = null;
-		boolean correcto, seguir;
-
-		System.out.println("Canciones de " + artista.getNombre());
-		cancionesExistentes.stream().forEach(c -> System.out.println(c.getId() + "\t" + c.getNombre()));
+		boolean seguir;
+		Session session = HibernateUtil.getSessionFactory().openSession();
 
 		do {
-			correcto = true;
 			seguir = true;
-			System.out.println("Añadir canciones");
-			opc = Util.solicitarSN("¿Se encuentra en la lista? (S/N)?");
-
-			if (opc == 'S') {
-				id = Util.solicitarEntero("Introduce el id de la canción: ");
-				cancion = daoCancion.obtenerCancionPorId(id);
-			} else if (opc == 'N') {
+			
+			if (cancionesExistentes.isEmpty()) {
 				cancion = crearObjetoCancionParaAlbum(artista);
-
 			} else {
-				correcto = false;
+				System.out.println("Canciones de " + artista.getNombre());
+				cancionesExistentes.stream().forEach(c -> System.out.println(c.getId() + "\t" + c.getNombre()));
+				opc = Util.solicitarSN("¿Se encuentra en la lista? (S/N)?");
+				
+				if (opc == 'N') {
+					cancion = crearObjetoCancionParaAlbum(artista);
+				} else {
+					id = Util.solicitarEntero("Introduce el id de la canción: ");
+					cancion = daoCancion.obtenerCancionPorId(id);
+					cancionesExistentes.remove(cancion);
+				}
 			}
 
-			if (correcto)
-				canciones.add(cancion);
+			canciones.add(cancion);
+			session.evict(cancion);
+			
 
 			opc = Util.solicitarSN("¿Añadir más canciones? (S/N)");
 
 			if (opc == 'N')
 				seguir = false;
-
+			
 		} while (seguir);
+		
+		for (Cancion c: cancionesExistentes) {
+			session.evict(c);
+		}
+		
+		session.close();
 
 		return canciones;
 	}
 
-	private static void nuevaPlaylist() {
+//Playlist
+
+	/**
+	 * Salta excepcion al añadir cuando ya hay alguna (preguntar merge)
+	 * 
+	 * @throws ReproductorException
+	 */
+	private static void añadirCanciones() throws ReproductorException {
+		CancionDAO daoCancion = new CancionDAO();
+		PlaylistDAO daoPlaylist = new PlaylistDAO();
+		Playlist playlist = buscarPlaylist();
+		Cancion cancion = buscarCancion();
+
+		playlist.addCancion(cancion);
+
+		daoPlaylist.actualizar(playlist);
+
+	}
+
+	private static void altaPlaylist() {
 		String nombre = Util.solicitarCadena("Introduce el nombre de la playlist: ");
 		String descripcion = Util.solicitarCadena("Introduce la descripción para la playlist " + nombre);
 
@@ -373,30 +478,6 @@ public class Principal {
 
 	}
 
-	
-
-
-
-
-
-
-
-
-
-	private static void bajaAlbum() {
-		AlbumDAO dao = new AlbumDAO();
-		String nombre = Util.solicitarCadena("Introduce el nombre del album: ");
-		List<Album> albunes = dao.obtenerListaAlbumPorNombre(nombre);
-
-		for (Album album : albunes) { // Hacerlo con lambda
-			System.out.println(album.getId() + "\t" + album.getNombre());
-		}
-		int id = Util.solicitarEntero("Introduce el id del album que deseas borrar:");
-
-		// Preguntar si deseas borrar las canciones o no
-		dao.borrar(dao.consultarAlbum(id));
-	}
-
 
 
 	private static void eliminarCancionPlaylist() throws ReproductorException {
@@ -413,16 +494,6 @@ public class Principal {
 
 		daoPlaylist.actualizar(playlist);
 		System.out.println("Eliminado correctamente la canción " + cancion.getNombre() + " de " + playlist.getNombre());
-	}
-
-	private static void consultarGenerosMasEscuchados() {
-		CancionDAO dao = new CancionDAO();
-		List<Object[]> canciones = dao.obtenerGeneroMasEscuchado();
-
-		for (Object[] o : canciones) {
-			System.out.println(o[0] + "\t" + o[1].toString());
-		}
-
 	}
 
 	private static void cambiarNombreArtista() throws ReproductorException {
@@ -467,32 +538,35 @@ public class Principal {
 
 	private static void bajaPlaylist() throws ReproductorException {
 		PlaylistDAO dao = new PlaylistDAO();
-		String nombre = Util.solicitarCadena("Introduce el nombre de la playlist: ");
-		List<Playlist> lista = dao.buscarPlaylist(nombre);
-		char opc;
 		Playlist playlist = buscarPlaylist();
+		char opc = Util.solicitarSN("Seguro que deseas borrar la playlist " + playlist.getNombre() + "? (S/N)");
 
-		opc = Util.solicitarSN("Seguro que deseas borrar la playlist " + playlist.getNombre() + "? (S/N)");
 		if (opc == 'S')
 			dao.borrar(playlist);
 
 	}
 
-	private static void consultarAlbum() throws ReproductorException {
-		Album album = buscarAlbum();
-		System.out.println(
-				album.getNombre() + ", " + album.getArtista().getNombre() + " (" + album.getPublicacion() + ")");
-		int pos = 1;
-		for (Cancion cancion : album.getCanciones()) {
-			System.out.println(pos + ". " + cancion.getNombre());
-			pos++;
-		}
+	private static void consultarGeneroMasEscuchadoDePlaylist() throws ReproductorException {
+		Playlist playlist = buscarPlaylist();
+		PlaylistDAO dao = new PlaylistDAO();
+		Object[] objetoAnterior = null;
+		if (playlist.getCanciones().size() == 0) 
+			throw new ReproductorException("La playlist no tiene canciones.");
+		
+
+		List<Object[]> lista = dao.obtenerGeneroMasEscuchado(playlist);
+
+		System.out.println("El género más escuchado es " + lista.get(0)[1] + " con un total de " + lista.get(0)[0]
+				+ " canciones.");
 	}
+
+
 
 //Búsquedas
 
 	/**
 	 * Busca un album en la base de datos introduciendo su nombre
+	 * 
 	 * @return
 	 * @throws ReproductorException
 	 */
@@ -556,7 +630,8 @@ public class Principal {
 
 			if (listaPlaylists.size() == 1) {
 				if (!listaPlaylists.get(0).getNombre().equalsIgnoreCase(nombre)) {
-					System.out.println(listaPlaylists.get(0).getNombre() + " - " + listaPlaylists.get(0).getDescripcion());
+					System.out.println(
+							listaPlaylists.get(0).getNombre() + " - " + listaPlaylists.get(0).getDescripcion());
 					opc = Util.solicitarSN("¿Es esta playlist la que buscabas? (S/N)");
 					if (opc == 'S')
 						playlist = listaPlaylists.get(0);
@@ -588,7 +663,7 @@ public class Principal {
 		Artista artista = null;
 		String nombre;
 		List<Artista> listaArtistas;
-		
+
 		do {
 			nombre = Util.solicitarCadena("Introduce el nombre del artista: ");
 			listaArtistas = dao.obtenerListaArtistasPorNombre(nombre);
@@ -663,7 +738,7 @@ public class Principal {
 	private static void tratarMenuCancion(int opc) throws ReproductorException {
 		switch (opc) {
 		case 1:
-			nuevaCancion(); // No guarda artista
+			altaCancion();
 			break;
 		case 2:
 			bajaCancion();
@@ -677,10 +752,10 @@ public class Principal {
 	private static void tratarMenuArtista(int opc) throws ReproductorException {
 		switch (opc) {
 		case 1:
-			nuevoArtista();
+			altaArtista();
 			break;
 		case 2:
-			bajaArtista(); // Sin hacer
+			bajaArtista();
 			break;
 		case 3:
 			mostrarTodosArtista();
@@ -700,7 +775,7 @@ public class Principal {
 	private static void tratarMenuAlbum(int opc) throws ReproductorException {
 		switch (opc) {
 		case 1:
-			nuevoAlbum(); // Sin terminar
+			altaAlbum(); // Sin terminar
 			break;
 		case 2:
 			bajaAlbum();
@@ -714,7 +789,7 @@ public class Principal {
 	private static void tratarMenuPlaylist(int opc) throws ReproductorException {
 		switch (opc) {
 		case 1:
-			nuevaPlaylist();
+			altaPlaylist();
 			break;
 		case 2:
 			bajaPlaylist();
@@ -745,17 +820,6 @@ public class Principal {
 		}
 	}
 
-	private static void consultarGeneroMasEscuchadoDePlaylist() throws ReproductorException {
-		Playlist playlist = buscarPlaylist();
-		PlaylistDAO dao = new PlaylistDAO();
-		
-		List<Object[]> lista = dao.obtenerGeneroMasEscuchado(playlist);
-		
-		for(Object[] o: lista) {
-			System.out.println(o[0] + " - " + o[1]);
-		}
-	}
-
 	private static void tratarMenuPrincipal(int opc) throws ReproductorException {
 		int eleccion;
 		switch (opc) {
@@ -777,9 +841,5 @@ public class Principal {
 			break;
 		}
 	}
-
-//Util
-
-
 
 }

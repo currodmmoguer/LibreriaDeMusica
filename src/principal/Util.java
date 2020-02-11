@@ -36,7 +36,7 @@ public class Util {
 			correcto = true;
 			System.out.println(msg);
 			c = teclado.nextLine().toUpperCase().charAt(0);
-			if (c != 'S' || c != 'N') { // Comprueba que se introduzca S o N
+			if (c != 'S' && c != 'N') { // Comprueba que se introduzca S o N
 				correcto = false;
 				System.out.println("Debes introducir 'S' o 'N' exclusivamente.");
 			}
@@ -55,7 +55,7 @@ public class Util {
 		do {
 			System.out.println(msg);
 			nombre = teclado.nextLine();
-		} while (nombre.length() == 0 || nombre == null);
+		} while (nombre == null);
 
 		return nombre;
 	}

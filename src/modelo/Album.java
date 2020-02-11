@@ -39,7 +39,6 @@ public class Album implements Serializable{
 	
 	@ManyToOne
 	@JoinColumn(name="IdArtista")
-	//@Type(type="integer")
 	@NotNull
 	private Artista artista;
 	
