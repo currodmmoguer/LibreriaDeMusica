@@ -1,5 +1,8 @@
 package dao;
 
+import java.util.List;
+import java.util.Set;
+
 import org.hibernate.Session;
 
 import modelo.HibernateUtil;
@@ -28,6 +31,16 @@ public class GenericDAO<T> {
 		Session session = HibernateUtil.getSessionFactory().openSession();
 		session.beginTransaction();
 		session.delete(entidad);
+		session.getTransaction().commit();
+		session.close();
+	}
+	
+	public void borrarLista(Set<T> lista) {
+		Session session = HibernateUtil.getSessionFactory().openSession();
+		session.beginTransaction();
+		for (T entidad: lista) {
+			session.delete(entidad);
+		}
 		session.getTransaction().commit();
 		session.close();
 	}
