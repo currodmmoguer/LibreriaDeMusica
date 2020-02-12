@@ -99,7 +99,7 @@ public class Menus {
 			System.out.println("6. Eliminar cancion");
 			System.out.println("7. Consultar todas las playlist");
 			System.out.println("8. Consultar playlist");
-			System.out.println("9. Consultar playlist que contengan una canción");
+			System.out.println("9. Consultar playlist que contengan una canción");	//Solo si me da tiempo
 			System.out.println("10. Consultar cual es el género más escuchado de una playlist");
 			System.out.println("11. Volver");
 

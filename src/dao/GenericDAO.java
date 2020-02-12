@@ -6,6 +6,11 @@ import modelo.HibernateUtil;
 
 public class GenericDAO<T> {
 	
+	/**
+	 * Guarda una entidad en la base de datos
+	 * @param entidad
+	 * @return
+	 */
 	public T guardar(T entidad) {
 		Session session = HibernateUtil.getSessionFactory().openSession();
 		session.beginTransaction();
@@ -15,7 +20,11 @@ public class GenericDAO<T> {
 		return entidad;
 	}
 	
-	public  void borrar(T entidad) {
+	/**
+	 * Elimina una entidad de la base de datos
+	 * @param entidad
+	 */
+	public void borrar(T entidad) {
 		Session session = HibernateUtil.getSessionFactory().openSession();
 		session.beginTransaction();
 		session.delete(entidad);
@@ -23,6 +32,10 @@ public class GenericDAO<T> {
 		session.close();
 	}
 	
+	/**
+	 * Actualiza una entidad en la base de datos
+	 * @param entidad
+	 */
 	public void actualizar(T entidad) {
 		Session session = HibernateUtil.getSessionFactory().openSession();
 		session.beginTransaction();

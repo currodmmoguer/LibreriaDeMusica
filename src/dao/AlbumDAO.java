@@ -1,28 +1,19 @@
 package dao;
 
-import java.util.ArrayList;
 import java.util.List;
-
 import org.hibernate.Query;
 import org.hibernate.Session;
-
 import modelo.Album;
-import modelo.Artista;
 import modelo.HibernateUtil;
 
 public class AlbumDAO extends GenericDAO<Album> {
 
-	public Album obtenerAlbumPorNombre(String nombre) {
-		Album album = null;
-		Session session = HibernateUtil.getSessionFactory().openSession();
-		Query query = (Query) session.createQuery("SELECT a FROM Album a WHERE Nombre='"+nombre+"'");
-		if (query.list().size()>0)
-			album = (Album) query.list().get(0);
-		
-		session.close();
-		return album;
-	}
 	
+	/**
+	 * Obtiene una lista de albunes cuyo nombre contenga lo indicado
+	 * @param nombre del album
+	 * @return List<Album>
+	 */
 	public List<Album> obtenerListaAlbumPorNombre(String nombre){
 		Session session = HibernateUtil.getSessionFactory().openSession();
 		Query query = session.createQuery("SELECT a FROM Album a WHERE Nombre LIKE'%"+nombre+"%'");
@@ -31,28 +22,28 @@ public class AlbumDAO extends GenericDAO<Album> {
 		return albunes;
 	}
 	
+	/**
+	 * Obtiene todos los albunes de un artista
+	 * @param id del artista indicado
+	 * @return List<Album>
+	 */
 	public List<Album> obtenerAlbunesPorArtista(int id){
 		List<Album> lista;
 		Session session = HibernateUtil.getSessionFactory().openSession();
-		Query query = session.createQuery("SELECT a FROM Album a WHERE IdArtista='"+id+"'");
+		Query query = session.createQuery("SELECT a FROM Album a WHERE IdArtista='"+id+"' ORDER BY Publicacion DESC");
 		lista = query.list();
 		session.close();
 		return lista;
 	}
 	
-	public Album consultarAlbum(int id) {
+	/**
+	 * Obtiene un album indicando su id
+	 * @param id
+	 * @return Album
+	 */
+	public Album getAlbum(int id) {
 		Session session = HibernateUtil.getSessionFactory().openSession();
 		Album album = (Album) session.get(Album.class, id);
-		session.close();
-		return album;
-	}
-	
-	public Album consultarAlbum(String nombre) {
-		Album album = null;
-		Session session = HibernateUtil.getSessionFactory().openSession();
-		Query query = session.createQuery("SELECT a FROM Album a WHERE Nombre='" + nombre + "'");
-		if (query.list().size() > 0)
-			album = (Album) query.list().get(0);
 		session.close();
 		return album;
 	}

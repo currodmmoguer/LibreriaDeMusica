@@ -89,20 +89,31 @@ public class Playlist implements Serializable{
 		this.canciones = canciones;
 	}
 	
-	public boolean addCancion(Cancion cancion) {
+	/**
+	 * Añade canción 
+	 * @param cancion
+	 * @return
+	 * @throws ReproductorException
+	 */
+	public boolean addCancion(Cancion cancion) throws ReproductorException {
 		boolean contiene = true;
 		LinkedList<Cancion> canciones = convertirALinked();
 		if (!canciones.contains(cancion)) {
 			canciones.push(cancion);
 			contiene = false;
+		} else {
+			throw new ReproductorException("La playlist ya contiene la canción escogida.");
 		}
-		
-		//System.out.println(canciones);
 		this.canciones = canciones;
 		
 		return contiene;
 	}
 	
+	/**
+	 * Elimina una canción de la lista
+	 * @param cancion
+	 * @return
+	 */
 	public boolean eliminarCancion(Cancion cancion) {
 		boolean encontrada = false;
 		int contador = 0;
@@ -116,6 +127,11 @@ public class Playlist implements Serializable{
 		return encontrada;
 	}
 	
+	/**
+	 * Cambia el nombre de la playlist
+	 * @param nombre
+	 * @throws ReproductorException
+	 */
 	public void cambiarNombre(String nombre) throws ReproductorException {
 		if (nombre == null || nombre.length() == 0) 
 			throw new ReproductorException("No puedes dejar el nombre vacío.");
@@ -125,6 +141,10 @@ public class Playlist implements Serializable{
 		
 	}
 	
+	/**
+	 * Cambia la descripción de la playlist
+	 * @param descripcion
+	 */
 	public void cambiarDescripcion(String descripcion) {
 		this.setDescripcion(descripcion);
 		System.out.println("Se ha cambiado la descripción de la playlist correctamente.");
@@ -146,6 +166,10 @@ public class Playlist implements Serializable{
 		return id;
 	}
 	
+	/**
+	 * Obtiene la duración total de la playlist
+	 * @return
+	 */
 	public LocalTime getDuracion() {
 		LocalTime tiempo = LocalTime.of(0, 0, 0);
 		int horas, minutos, segundos;

@@ -45,7 +45,6 @@ public class Album implements Serializable{
 	@OneToMany(fetch = FetchType.EAGER)
 	@JoinColumn(name="IdAlbum")
 	@Cascade(CascadeType.SAVE_UPDATE)
-	//@IndexColumn(name="idx")
 	@Size(min=1)
 	private List<Cancion> canciones;
 	
@@ -87,6 +86,13 @@ public class Album implements Serializable{
 	
 	public void setCanciones(List<Cancion> canciones) {
 		this.canciones = canciones;
+	}
+	/**
+	 * Añade una canción a la lista
+	 * @param c
+	 */
+	public void addCancion(Cancion c) {
+		canciones.add(c);
 	}
 	
 	public int getId() {

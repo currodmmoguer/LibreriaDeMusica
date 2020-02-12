@@ -40,7 +40,6 @@ public class Artista implements Serializable {
 	@OneToMany(fetch = FetchType.EAGER)
 	@Cascade(CascadeType.SAVE_UPDATE)
 	@JoinColumn(name="IdArtista")
-	//@IndexColumn(name="idx")
 	private Set<Album> albunes;
 	
 	@ManyToMany(fetch = FetchType.EAGER)
@@ -48,9 +47,7 @@ public class Artista implements Serializable {
 	@JoinTable(name="ArtistaCancion", joinColumns = {@JoinColumn(name="IdArtista")}, inverseJoinColumns = {@JoinColumn(name="IdCancion")})
 	private Set<Cancion> canciones;
 	
-	public Artista() {
-		// TODO Auto-generated constructor stub
-	}
+	public Artista() {	}
 
 	public Artista(String nombre) {
 		super();
@@ -84,6 +81,11 @@ public class Artista implements Serializable {
 		return this.albunes;
 	}
 	
+	/**
+	 * Cambia el nombre del artista
+	 * @param nombre
+	 * @throws ReproductorException
+	 */
 	public void cambiarNombre(String nombre) throws ReproductorException {
 		if (nombre == null || nombre.length() == 0)
 			throw new ReproductorException("No puedes dejar el nombre vacío.");
@@ -92,10 +94,18 @@ public class Artista implements Serializable {
 		System.out.println("Se ha modificado el nombre correctamente.");
 	}
 	
+	/**
+	 * Borra una canción
+	 * @param cancion
+	 */
 	public void borrarCancion(Cancion cancion) {
 		canciones.remove(cancion);
 	}
 	
+	/**
+	 * Añade un album
+	 * @param album
+	 */
 	public void addAlbum(Album album) {
 		this.albunes.add(album);
 	}

@@ -70,7 +70,7 @@ public class Cancion implements Serializable {
 	
 	public Cancion() {}
 
-	public Cancion(String nombre, List<Artista> artistas, Album album, LocalTime duración, LocalDate publicacion, Genero genero)
+	public Cancion(String nombre, List<Artista> artistas, LocalTime duración, LocalDate publicacion, Genero genero)
 			throws ReproductorException {
 
 		if (artistas.size() == 0)
@@ -78,7 +78,6 @@ public class Cancion implements Serializable {
 
 		this.nombre = nombre;
 		this.artistas = artistas;
-		this.album = album;
 		this.duracion = duración;
 		this.publicacion = publicacion;
 		this.genero = genero;
