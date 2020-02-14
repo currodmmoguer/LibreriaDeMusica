@@ -48,6 +48,7 @@ public class Cancion implements Serializable {
 	@ManyToMany(mappedBy = "canciones", fetch = FetchType.EAGER)
 	@Cascade(CascadeType.SAVE_UPDATE)
 	//@Min(1)	Si lo descemoneto salta excepcion perso sigue el programa
+	@Valid
 	private Set<Artista> artistas;
 
 	@ManyToOne

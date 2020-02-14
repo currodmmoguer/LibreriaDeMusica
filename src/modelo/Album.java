@@ -48,6 +48,7 @@ public class Album implements Serializable{
 	@Cascade(CascadeType.SAVE_UPDATE)
 	@JoinColumn(name="IdAlbum")
 	@Size(min=1)
+	@Valid
 	private List<Cancion> canciones;
 	
 	@Column(name="Publicacion")
@@ -122,7 +123,8 @@ public class Album implements Serializable{
 	}
 	@Override
 	public String toString() {
-		StringBuilder sb = new StringBuilder(nombre);
+		StringBuilder sb = new StringBuilder();
+		sb.append(nombre);
 		if (artista != null) 	//Si no se controla y no tiene artista salta NullPointerException
 			sb.append(" - " + artista.getNombre());
 		

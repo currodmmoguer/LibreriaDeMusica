@@ -24,6 +24,7 @@ public class Principal {
 
 	public static void main(String[] args) {
 		HibernateUtil.getSessionFactory();
+		
 		int opc = 0;
 		do {
 			try {
@@ -322,7 +323,7 @@ public class Principal {
 
 		try {
 			artista = buscarArtista();
-		} catch (ReproductorException re) {
+		} catch (ReproductorException re) {	//En caso de que no encuentre coincidencias
 			System.out.println(re.getMessage());
 			if (Util.solicitarSN("¿Deseas crearlo? (S/N)")) {
 				artista = new Artista(Util.solicitarCadena("Introduce el nombre del artista: "));
@@ -334,6 +335,7 @@ public class Principal {
 					Util.solicitarFecha("Introduce la fecha de publicación (DD/MM/AAAA)"));
 
 			album.getCanciones().stream().forEach(c -> c.setPublicacion(album.getPublicacion()));
+			System.out.println(album);
 			Session session = HibernateUtil.getSessionFactory().openSession();
 			// canciones = null;//Olvida canciones
 			session.evict(artista);

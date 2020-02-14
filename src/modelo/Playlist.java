@@ -14,8 +14,7 @@ import javax.persistence.JoinColumn;
 import javax.persistence.JoinTable;
 import javax.persistence.ManyToMany;
 import javax.persistence.Table;
-
-import org.hibernate.Session;
+import javax.validation.Valid;
 import org.hibernate.annotations.Cascade;
 import org.hibernate.annotations.CascadeType;
 import org.hibernate.annotations.Fetch;
@@ -23,7 +22,7 @@ import org.hibernate.annotations.FetchMode;
 import org.hibernate.annotations.IndexColumn;
 import org.hibernate.annotations.Type;
 import org.hibernate.validator.constraints.NotBlank;
-import org.hibernate.validator.constraints.br.CNPJ;
+
 
 @Entity
 @Table(name="Playlist")
@@ -48,6 +47,7 @@ public class Playlist implements Serializable{
 	@Fetch(value = FetchMode.SUBSELECT)
 	@JoinTable(name="PlaylistCancion", joinColumns = {@JoinColumn(name="IdPlaylist")}, inverseJoinColumns = {@JoinColumn(name="IdCancion")})
 	@IndexColumn(name = "idx")
+	@Valid
 	private List<Cancion> canciones;
 	
 	public Playlist() {
