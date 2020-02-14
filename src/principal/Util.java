@@ -4,7 +4,16 @@ import java.time.LocalDate;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
 import java.util.Scanner;
+import java.util.Set;
+
+import modelo.Artista;
+import modelo.Cancion;
+import modelo.Genero;
+import modelo.ReproductorException;
 
 public class Util {
 
@@ -141,6 +150,46 @@ public class Util {
 			}
 		} while (!correcto);
 		return publicacion;
+	}
+	
+
+	
+	/**
+	 * Crea un objeto canción para añadir a un album. La diferencia con el anterior
+	 * es que no solicita ni album ni fecha de publicación.
+	 * 
+	 * @param Artista
+	 * @return Canción
+	 * @throws ReproductorException
+	 */
+	public static Cancion crearObjetoCancionParaAlbum(Artista artista) throws ReproductorException {
+
+		String nombre = Util.solicitarCadena("Introduce el nombre de la cancion");
+		Set<Artista> listaArtistas = new HashSet<Artista>();
+		listaArtistas.add(artista);
+		LocalTime duracion = Util.solicitarHora("Introduce la duración de la canción (MM:SS): ");
+		Genero genero = solicitarGenero();
+		Cancion cancion = new Cancion(nombre, listaArtistas, duracion, genero);
+		listaArtistas.forEach(a -> a.getCanciones().add(cancion));
+		return cancion;
+	}
+	
+	/**
+	 * Solicita el genero que puede tener una canción para su posterior asignación
+	 * 
+	 * @return genero
+	 */
+	public static Genero solicitarGenero() {
+		int pos = 1;
+
+		for (Genero g : Genero.values()) { // Recorre el enumerado de genero y lo muestra
+			System.out.println(pos + ". " + g.toString());
+			pos++;
+		}
+
+		int posGenero = Util.solicitarEnteroEnRango("Introduce la posición del genero deseado.", 1,
+				Genero.values().length);
+		return Genero.getGenero(posGenero - 1); // Obtiene el genero por su posición
 	}
 
 }

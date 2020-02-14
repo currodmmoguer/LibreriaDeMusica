@@ -48,5 +48,12 @@ public class AlbumDAO extends GenericDAO<Album> {
 		return album;
 	}
 	
+	public List<Album> obtenerTodosAlbunes(){
+		Session session = HibernateUtil.getSessionFactory().openSession();
+		List<Album> lista = session.createQuery("SELECT a FROM Album a").list();
+		session.close();
+		return lista;
+	}
+	
 
 }

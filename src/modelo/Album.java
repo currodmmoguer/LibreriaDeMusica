@@ -14,6 +14,7 @@ import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
+import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 
@@ -39,12 +40,13 @@ public class Album implements Serializable{
 	
 	@ManyToOne
 	@JoinColumn(name="IdArtista")
-	@NotNull
+	@Cascade(CascadeType.SAVE_UPDATE)
+	@Valid
 	private Artista artista;
 	
 	@OneToMany(fetch = FetchType.EAGER)
-	@JoinColumn(name="IdAlbum")
 	@Cascade(CascadeType.SAVE_UPDATE)
+	@JoinColumn(name="IdAlbum")
 	@Size(min=1)
 	private List<Cancion> canciones;
 	
@@ -120,8 +122,24 @@ public class Album implements Serializable{
 	}
 	@Override
 	public String toString() {
-		return "Album [id=" + id + ", nombre=" + nombre + ", artista=" + artista + ", publicacion=" + lanzamiento + "]";
+		StringBuilder sb = new StringBuilder(nombre);
+		if (artista != null) 	//Si no se controla y no tiene artista salta NullPointerException
+			sb.append(" - " + artista.getNombre());
+		
+		sb.append(" (" + getPublicacion() + ")\n");
+		int pos = 1;
+		// Muestra las canciones del album
+		for (Cancion cancion : canciones) {
+			sb.append("\t" + pos + ". " + cancion.getNombre() +"\n");
+			pos++;
+		}
+		return sb.toString();
 	}
+	
+
+
+	
+
 	
 	
 }

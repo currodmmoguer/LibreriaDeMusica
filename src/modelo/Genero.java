@@ -4,6 +4,7 @@ public enum Genero {
 	LATINO,
 	POP,
 	DANCE,
+	FLAMENCO,
 	HIPHOP,
 	ROCK,
 	JAZZ,
@@ -11,7 +12,8 @@ public enum Genero {
 	SOUL,
 	CLASICA,
 	METAL,
-	BLUES;
+	BLUES,
+	OTRO;
 	
 	public static Genero getGenero(int pos) {
 		Genero[] generos = Genero.values();

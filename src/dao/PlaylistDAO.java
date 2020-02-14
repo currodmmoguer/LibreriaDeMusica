@@ -51,18 +51,18 @@ public class PlaylistDAO extends GenericDAO<Playlist> {
 	 * @param playlist
 	 * @return List<Object[]>
 	 */
-	public List<Object[]> obtenerGeneroMasEscuchado(Playlist playlist){
+	public Object[] obtenerGeneroMasEscuchado(Playlist playlist){
 		Session session = HibernateUtil.getSessionFactory().openSession();
 		Query query = session.createQuery("SELECT COUNT(c) as cantidad, c.genero "
 				+ "FROM Cancion c "
 				+ "JOIN c.playlists p "
 				+ "WHERE p.id= :idPlaylist "
 				+ "GROUP BY c.genero "
-				+ "ORDER BY cantidad DESC");
+				+ "ORDER BY cantidad DESC").setMaxResults(1);
 		query.setParameter("idPlaylist", playlist.getId());
-		List<Object[]> lista = query.list();
+		Object[] genero = (Object[]) query.list().get(0);
 		session.close();
-		return lista;
+		return genero;
 	}
 
 }

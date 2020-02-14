@@ -20,8 +20,10 @@ import org.hibernate.annotations.Cascade;
 import org.hibernate.annotations.CascadeType;
 import org.hibernate.annotations.Fetch;
 import org.hibernate.annotations.FetchMode;
+import org.hibernate.annotations.IndexColumn;
 import org.hibernate.annotations.Type;
 import org.hibernate.validator.constraints.NotBlank;
+import org.hibernate.validator.constraints.br.CNPJ;
 
 @Entity
 @Table(name="Playlist")
@@ -45,6 +47,7 @@ public class Playlist implements Serializable{
 	@Cascade(CascadeType.SAVE_UPDATE)
 	@Fetch(value = FetchMode.SUBSELECT)
 	@JoinTable(name="PlaylistCancion", joinColumns = {@JoinColumn(name="IdPlaylist")}, inverseJoinColumns = {@JoinColumn(name="IdCancion")})
+	@IndexColumn(name = "idx")
 	private List<Cancion> canciones;
 	
 	public Playlist() {
@@ -95,7 +98,7 @@ public class Playlist implements Serializable{
 	 * @return
 	 * @throws ReproductorException
 	 */
-	public boolean addCancion(Cancion cancion) throws ReproductorException {
+	public boolean addCancion1(Cancion cancion) throws ReproductorException {
 		boolean contiene = true;
 		LinkedList<Cancion> canciones = convertirALinked();
 		if (!canciones.contains(cancion)) {
@@ -107,6 +110,13 @@ public class Playlist implements Serializable{
 		this.canciones = canciones;
 		
 		return contiene;
+	}
+	
+	public void addCancion(Cancion cancion) throws ReproductorException {
+		if (canciones.contains(cancion))
+			throw new ReproductorException("La playlist ya contiene la canción escogida.");
+			
+		canciones.add(cancion);
 	}
 	
 	/**
@@ -207,11 +217,8 @@ public class Playlist implements Serializable{
 
 	@Override
 	public String toString() {
-		return "Playlist [id=" + id + ", nombre=" + nombre + ", canciones="  + canciones.toString() + "]";
+		return nombre + "\t" + descripcion + "\n\t" + getDuracion() + "\n";
 	}
-	
-	
-	
 	
 	
 }

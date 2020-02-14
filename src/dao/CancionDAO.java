@@ -34,6 +34,13 @@ public class CancionDAO extends GenericDAO<Cancion> {
 		return cancion;
 	}
 	
+	public List<Cancion> obtenerTodasCanciones(){
+		Session session = HibernateUtil.getSessionFactory().openSession();
+		List<Cancion> lista = session.createQuery("SELECT c FROM Cancion c").list();
+		session.close();
+		return lista;
+	}
+	
 	/**
 	 * Obtiene los 3 géneros musicales más hay
 	 * @return
