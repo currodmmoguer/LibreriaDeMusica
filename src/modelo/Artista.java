@@ -38,13 +38,13 @@ public class Artista implements Serializable {
 	@NotBlank
 	private String nombre;
 	
-	@OneToMany(fetch = FetchType.EAGER)
+	@OneToMany(fetch = FetchType.LAZY)
 	@Cascade(CascadeType.SAVE_UPDATE)
 	@JoinColumn(name="IdArtista")
 	@Valid
 	private Set<Album> albunes;
 	
-	@ManyToMany(fetch = FetchType.EAGER)
+	@ManyToMany(fetch = FetchType.LAZY)
 	@Cascade(CascadeType.SAVE_UPDATE)
 	@JoinTable(name="ArtistaCancion", joinColumns = {@JoinColumn(name="IdArtista")}, inverseJoinColumns = {@JoinColumn(name="IdCancion")})
 	@Valid
@@ -54,6 +54,7 @@ public class Artista implements Serializable {
 
 	public Artista(String nombre) {
 		super();
+		
 		this.nombre = nombre;
 		this.canciones = new HashSet<Cancion>();
 	}
@@ -95,6 +96,10 @@ public class Artista implements Serializable {
 		
 		this.setNombre(nombre);
 		System.out.println("Se ha modificado el nombre correctamente.");
+	}
+	
+	public void addCancion(Cancion cancion) {
+		canciones.add(cancion);
 	}
 	
 	/**

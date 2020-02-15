@@ -45,13 +45,14 @@ public class Cancion implements Serializable {
 	@NotBlank
 	private String nombre;
 
-	@ManyToMany(mappedBy = "canciones", fetch = FetchType.EAGER)
+	@ManyToMany(mappedBy = "canciones", fetch = FetchType.LAZY)
 	@Cascade(CascadeType.SAVE_UPDATE)
 	//@Min(1)	Si lo descemoneto salta excepcion perso sigue el programa
 	@Valid
 	private Set<Artista> artistas;
 
 	@ManyToOne
+	@Cascade(CascadeType.SAVE_UPDATE)
 	@JoinColumn(name = "IdAlbum")
 	@Valid
 	private Album album;
@@ -61,7 +62,6 @@ public class Cancion implements Serializable {
 	private LocalTime duracion;
 
 	@Column(name = "Publicacion")
-	@NotNull
 	private LocalDate publicacion;
 
 	@ManyToMany(fetch = FetchType.LAZY)
@@ -80,6 +80,8 @@ public class Cancion implements Serializable {
 	public Cancion(String nombre, Set<Artista> artistas, LocalTime duración, LocalDate publicacion, Genero genero)
 			throws ReproductorException {
 
+		if (nombre == null || nombre.equals(""))
+			throw new ReproductorException("No se ha podido crear la canción porque no se puede crear sin nombre");
 		if (artistas.size() == 0)
 			throw new ReproductorException("No se ha podido crear la canción ya debe tener un artista mínimo");
 

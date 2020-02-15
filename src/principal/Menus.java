@@ -9,7 +9,7 @@ public class Menus {
 	protected static int menuPrincipal() {
 		int opc = 0;
 		try {
-			System.out.println("\nGESTIÓN DE BASE DE DATOS DE REPRODUCTOR MULTIMEDIA");
+			System.out.println("\n------ Menú principal ------");
 			System.out.println("1. Canciones");
 			System.out.println("2. Artistas");
 			System.out.println("3. Albunes");
@@ -29,6 +29,7 @@ public class Menus {
 	protected static int menuArtistas() {
 		int opc = 0;
 		try {
+			System.out.println("\n------ Menú artistas ------");
 			System.out.println("1. Alta artista");
 			System.out.println("2. Borrar artista");
 			System.out.println("3. Consultar todos los artista");
@@ -53,6 +54,7 @@ public class Menus {
 	protected static int menuCancion() {
 		int opc = 0;
 		try {
+			System.out.println("\n------ Menú canciones ------");
 			System.out.println("1. Alta canción");
 			System.out.println("2. Borrar canción");
 			System.out.println("3. Consultar el género más escuchado");
@@ -73,6 +75,7 @@ public class Menus {
 	protected static int menuAlbum() {
 		int opc = 0;
 		try {
+			System.out.println("\n------ Menú álbunes ------");
 			System.out.println("1. Alta album");
 			System.out.println("2. Borrar album");
 			System.out.println("3. Consultar album");
@@ -93,6 +96,7 @@ public class Menus {
 	protected static int menuPlaylist() {
 		int opc = 0;
 		try {
+			System.out.println("\n------ Menú playlists ------");
 			System.out.println("1. Alta playlist");
 			System.out.println("2. Borrar playlist");
 			System.out.println("3. Cambiar nombre");

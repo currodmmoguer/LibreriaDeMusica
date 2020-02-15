@@ -5,50 +5,51 @@ import javax.validation.ConstraintViolationException;
 
 import org.hibernate.Session;
 import modelo.HibernateUtil;
+import modelo.ReproductorException;
 
 public class GenericDAO<T> {
+	Session session;
+	
+	public GenericDAO(Session session) {
+		this.session = session;
+	}
 
 	/**
 	 * Guarda una entidad en la base de datos
 	 * 
 	 * @param entidad
 	 * @return
+	 * @throws ReproductorException 
 	 */
-	public T guardar(T entidad) {
-		Session session = HibernateUtil.getSessionFactory().openSession();
+	public T guardar(T entidad) throws ReproductorException {
 		try {
-			session.beginTransaction();
 			session.save(entidad);
-			session.getTransaction().commit();
 		} catch (ConstraintViolationException cve) {
-			session.getTransaction().rollback();
-			System.out.println("Error al guardar");
 			for(ConstraintViolation cv : cve.getConstraintViolations()) {
-				System.out.println("Campo: " + cv.getPropertyPath());
+				System.err.println("El campo " + cv.getPropertyPath() + " " + cv.getMessage());
 			}
-		} finally {
-			session.close();
+			throw new ReproductorException("Error al guardar");
 		}
 
 		return entidad;
 	}
+	
+	
 
 	/**
 	 * Elimina una entidad de la base de datos
 	 * 
 	 * @param entidad
+	 * @throws ReproductorException 
 	 */
-	public void borrar(T entidad) {
-		Session session = HibernateUtil.getSessionFactory().openSession();
+	public void borrar(T entidad) throws ReproductorException {
 		try {
-			session.beginTransaction();
 			session.delete(entidad);
-			session.getTransaction().commit();
 		} catch (ConstraintViolationException cve) {
-			session.getTransaction().rollback();
-			System.out.println("Error al borrar");
-		} finally {
-			session.close();
+			for(ConstraintViolation cv : cve.getConstraintViolations()) {
+				System.err.println("El campo " + cv.getPropertyPath() + " " + cv.getMessage());
+			}
+			throw new ReproductorException("Error al borrar");
 		}
 	}
 
@@ -56,19 +57,27 @@ public class GenericDAO<T> {
 	 * Actualiza una entidad en la base de datos
 	 * 
 	 * @param entidad
+	 * @throws ReproductorException 
 	 */
-	public void actualizar(T entidad) {
-		Session session = HibernateUtil.getSessionFactory().openSession();
+	public void actualizar(T entidad) throws ReproductorException {
 		try {
-			session.beginTransaction();
 			session.update(entidad);
-			session.getTransaction().commit();
+		} catch (ConstraintViolationException cve) {
+			for(ConstraintViolation cv : cve.getConstraintViolations()) {
+				System.err.println("El campo " + cv.getPropertyPath() + " " + cv.getMessage());
+			}
+			throw new ReproductorException("Error al acutalizar");
+		} 
+
+	}
+	
+	public void merge(T entidad) {
+		try {
+			session.merge(entidad);
 		} catch (ConstraintViolationException cve) {
 			session.getTransaction().rollback();
 			System.out.println("Error al actualizar");
-		} finally {
-			session.close();
-		}
+		} 
 
 	}
 

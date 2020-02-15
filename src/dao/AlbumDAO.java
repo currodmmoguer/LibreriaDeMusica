@@ -4,54 +4,57 @@ import java.util.List;
 import org.hibernate.Query;
 import org.hibernate.Session;
 import modelo.Album;
+import modelo.Artista;
+import modelo.Cancion;
 import modelo.HibernateUtil;
 
 public class AlbumDAO extends GenericDAO<Album> {
 
 	
+	public AlbumDAO(Session session) {
+		super(session);
+	}
+
 	/**
-	 * Obtiene una lista de albunes cuyo nombre contenga lo indicado
+	 * Obtiene una lista de álbunes cuyo nombre contenga lo indicado por parámetro
 	 * @param nombre del album
 	 * @return List<Album>
 	 */
 	public List<Album> obtenerListaAlbumPorNombre(String nombre){
-		Session session = HibernateUtil.getSessionFactory().openSession();
 		Query query = session.createQuery("SELECT a FROM Album a WHERE Nombre LIKE'%"+nombre+"%'");
 		List<Album> albunes = query.list();
-		session.close();
 		return albunes;
 	}
 	
 	/**
-	 * Obtiene todos los albunes de un artista
+	 * Obtiene todos los álbunes de un artista
 	 * @param id del artista indicado
 	 * @return List<Album>
 	 */
-	public List<Album> obtenerAlbunesPorArtista(int id){
+	public List<Album> obtenerAlbunesPorArtista(Artista artista){
 		List<Album> lista;
-		Session session = HibernateUtil.getSessionFactory().openSession();
-		Query query = session.createQuery("SELECT a FROM Album a WHERE IdArtista='"+id+"' ORDER BY Publicacion DESC");
+		Query query = session.createQuery("SELECT a FROM Album a WHERE IdArtista='"+artista.getId()+"' ORDER BY Publicacion DESC");
 		lista = query.list();
-		session.close();
 		return lista;
 	}
 	
 	/**
-	 * Obtiene un album indicando su id
+	 * Obtiene un album indicando su id por parámetro
 	 * @param id
 	 * @return Album
 	 */
 	public Album getAlbum(int id) {
-		Session session = HibernateUtil.getSessionFactory().openSession();
 		Album album = (Album) session.get(Album.class, id);
-		session.close();
 		return album;
 	}
 	
+	public List<Cancion> obtenerCancionesAlbum(int id) {
+		List<Cancion> lista = session.createQuery("SELECT c FROM Cancion c WHERE IdAlbum="+id).list();
+		return lista;
+	}
+	
 	public List<Album> obtenerTodosAlbunes(){
-		Session session = HibernateUtil.getSessionFactory().openSession();
 		List<Album> lista = session.createQuery("SELECT a FROM Album a").list();
-		session.close();
 		return lista;
 	}
 	

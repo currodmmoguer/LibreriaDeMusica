@@ -1,6 +1,7 @@
 package modelo;
 import java.io.Serializable;
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -44,8 +45,8 @@ public class Album implements Serializable{
 	@Valid
 	private Artista artista;
 	
-	@OneToMany(fetch = FetchType.EAGER)
-	@Cascade(CascadeType.SAVE_UPDATE)
+	@OneToMany(fetch = FetchType.LAZY, orphanRemoval = true)
+	@Cascade(CascadeType.ALL)
 	@JoinColumn(name="IdAlbum")
 	@Size(min=1)
 	@Valid
@@ -64,6 +65,13 @@ public class Album implements Serializable{
 		this.canciones = canciones;
 		this.lanzamiento = publicacion;
 	}
+	public Album(String nombre, Artista artista, LocalDate publicacion) {
+		this.nombre = nombre;
+		this.artista = artista;
+		this.lanzamiento = publicacion;
+		canciones = new ArrayList<>();
+	}
+
 	public String getNombre() {
 		return nombre;
 	}
@@ -130,8 +138,9 @@ public class Album implements Serializable{
 		
 		sb.append(" (" + getPublicacion() + ")\n");
 		int pos = 1;
+		
 		// Muestra las canciones del album
-		for (Cancion cancion : canciones) {
+		for (Cancion cancion : getCanciones()) {
 			sb.append("\t" + pos + ". " + cancion.getNombre() +"\n");
 			pos++;
 		}

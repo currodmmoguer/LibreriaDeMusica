@@ -8,15 +8,17 @@ import modelo.HibernateUtil;
 
 public class ArtistaDAO extends GenericDAO<Artista>{
 	
+	public ArtistaDAO(Session session) {
+		super(session);
+	}
+
 	/**
 	 * Obtiene un artista indicando su id
 	 * @param id
 	 * @return Artista
 	 */
 	public Artista getArtista(int id) {
-		Session session = HibernateUtil.getSessionFactory().openSession();
 		Artista artista = (Artista) session.get(Artista.class, id);
-		session.close();
 		return artista;
 	}
 	
@@ -26,10 +28,8 @@ public class ArtistaDAO extends GenericDAO<Artista>{
 	 * @return si existe
 	 */
 	public boolean existeArtista(String nombre) {
-		Session session = HibernateUtil.getSessionFactory().openSession();
 		Query query = session.createQuery("SELECT a FROM Artista a WHERE Nombre='"+nombre+"'");
 		boolean existe = (query.list().isEmpty() ? false : true);	//Comprueba si está vacía la lista
-		session.close();
 		return existe;
 	}
 	
@@ -39,9 +39,7 @@ public class ArtistaDAO extends GenericDAO<Artista>{
 	 * @return List<Artista>
 	 */
 	public List<Artista> obtenerListaArtistasPorNombre(String nombre){
-		Session session = HibernateUtil.getSessionFactory().openSession();
 		List<Artista> artistas = session.createQuery("SELECT a FROM Artista a WHERE Nombre LIKE '%" + nombre + "%'").list();
-		session.close();
 		return artistas;
 	}
 	
@@ -63,10 +61,8 @@ public class ArtistaDAO extends GenericDAO<Artista>{
 	 */
 	public List<Artista> consultarArtistas(){
 		List<Artista> lista;
-		Session session = HibernateUtil.getSessionFactory().openSession();
 		Query query = session.createQuery("SELECT a FROM Artista a");
 		lista = query.list();
-		session.close();
 		return lista;
 	}
 	

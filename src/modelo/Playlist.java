@@ -42,7 +42,7 @@ public class Playlist implements Serializable{
 	private String descripcion;
 	
 
-	@ManyToMany(fetch = FetchType.EAGER)
+	@ManyToMany(fetch = FetchType.LAZY)
 	@Cascade(CascadeType.SAVE_UPDATE)
 	@Fetch(value = FetchMode.SUBSELECT)
 	@JoinTable(name="PlaylistCancion", joinColumns = {@JoinColumn(name="IdPlaylist")}, inverseJoinColumns = {@JoinColumn(name="IdCancion")})
