@@ -1,12 +1,9 @@
 package dao;
 
 import java.util.List;
-import org.hibernate.Query;
 import org.hibernate.Session;
 import modelo.Album;
 import modelo.Artista;
-import modelo.Cancion;
-import modelo.HibernateUtil;
 
 public class AlbumDAO extends GenericDAO<Album> {
 
@@ -16,46 +13,39 @@ public class AlbumDAO extends GenericDAO<Album> {
 	}
 
 	/**
-	 * Obtiene una lista de álbunes cuyo nombre contenga lo indicado por parámetro
-	 * @param nombre del album
-	 * @return List<Album>
+	 * Obtiene una lista de álbunes cuyo nombre del álbum contenga lo indicado por parámetro
+	 * @param String nombre del album buscado
+	 * @return List<Album> lista de albunes que coincidan
 	 */
 	public List<Album> obtenerListaAlbumPorNombre(String nombre){
-		Query query = session.createQuery("SELECT a FROM Album a WHERE Nombre LIKE'%"+nombre+"%'");
-		List<Album> albunes = query.list();
-		return albunes;
+		return session.createQuery("SELECT a FROM Album a WHERE Nombre LIKE'%"+nombre+"%'").list();
 	}
 	
 	/**
-	 * Obtiene todos los álbunes de un artista
-	 * @param id del artista indicado
-	 * @return List<Album>
+	 * Obtiene todos los álbunes de un artista indicado
+	 * @param Artista
+	 * @return List<Album> lista de todos su albunes ordenado por fecha descendiente
 	 */
 	public List<Album> obtenerAlbunesPorArtista(Artista artista){
-		List<Album> lista;
-		Query query = session.createQuery("SELECT a FROM Album a WHERE IdArtista='"+artista.getId()+"' ORDER BY Publicacion DESC");
-		lista = query.list();
-		return lista;
+		return session.createQuery("SELECT a FROM Album a WHERE IdArtista='"+artista.getId()+"' ORDER BY Publicacion DESC").list();
 	}
 	
 	/**
-	 * Obtiene un album indicando su id por parámetro
-	 * @param id
+	 * Obtiene un álbum indicando su id por parámetro
+	 * @param id del album
 	 * @return Album
 	 */
 	public Album getAlbum(int id) {
-		Album album = (Album) session.get(Album.class, id);
-		return album;
+		return (Album) session.get(Album.class, id);
 	}
 	
-	public List<Cancion> obtenerCancionesAlbum(int id) {
-		List<Cancion> lista = session.createQuery("SELECT c FROM Cancion c WHERE IdAlbum="+id).list();
-		return lista;
-	}
 	
+	/**
+	 * Obtiene todos los álbunes de la base de datos ordenadors por su publicación
+	 * @return List<Album>
+	 */
 	public List<Album> obtenerTodosAlbunes(){
-		List<Album> lista = session.createQuery("SELECT a FROM Album a").list();
-		return lista;
+		return session.createQuery("SELECT a FROM Album a ORDER BY Publicacion DESC").list();
 	}
 	
 

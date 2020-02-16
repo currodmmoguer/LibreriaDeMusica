@@ -2,9 +2,7 @@ package modelo;
 import java.io.Serializable;
 import java.time.LocalDate;
 import java.util.ArrayList;
-import java.util.LinkedList;
 import java.util.List;
-
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
@@ -18,7 +16,6 @@ import javax.persistence.Table;
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
-
 import org.hibernate.annotations.Cascade;
 import org.hibernate.annotations.CascadeType;
 import org.hibernate.annotations.Type;
@@ -65,6 +62,7 @@ public class Album implements Serializable{
 		this.canciones = canciones;
 		this.lanzamiento = publicacion;
 	}
+	
 	public Album(String nombre, Artista artista, LocalDate publicacion) {
 		this.nombre = nombre;
 		this.artista = artista;
@@ -99,8 +97,8 @@ public class Album implements Serializable{
 		this.canciones = canciones;
 	}
 	/**
-	 * Añade una canción a la lista
-	 * @param c
+	 * Añade una canción a la lista de canciones
+	 * @param Canción
 	 */
 	public void addCancion(Cancion c) {
 		canciones.add(c);
@@ -136,7 +134,7 @@ public class Album implements Serializable{
 		if (artista != null) 	//Si no se controla y no tiene artista salta NullPointerException
 			sb.append(" - " + artista.getNombre());
 		
-		sb.append(" (" + getPublicacion() + ")\n");
+		sb.append(" (" + getPublicacion() + ")\n");	//Añade la fecha de publicación
 		int pos = 1;
 		
 		// Muestra las canciones del album

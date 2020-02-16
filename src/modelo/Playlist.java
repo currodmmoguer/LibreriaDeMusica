@@ -17,9 +17,6 @@ import javax.persistence.Table;
 import javax.validation.Valid;
 import org.hibernate.annotations.Cascade;
 import org.hibernate.annotations.CascadeType;
-import org.hibernate.annotations.Fetch;
-import org.hibernate.annotations.FetchMode;
-import org.hibernate.annotations.IndexColumn;
 import org.hibernate.annotations.Type;
 import org.hibernate.validator.constraints.NotBlank;
 
@@ -40,19 +37,15 @@ public class Playlist implements Serializable{
 	
 	@Column(name="Descripcion")
 	private String descripcion;
-	
 
 	@ManyToMany(fetch = FetchType.LAZY)
 	@Cascade(CascadeType.SAVE_UPDATE)
-	@Fetch(value = FetchMode.SUBSELECT)
+	//@Fetch(value = FetchMode.SUBSELECT)
 	@JoinTable(name="PlaylistCancion", joinColumns = {@JoinColumn(name="IdPlaylist")}, inverseJoinColumns = {@JoinColumn(name="IdCancion")})
-	@IndexColumn(name = "idx")
 	@Valid
 	private List<Cancion> canciones;
 	
-	public Playlist() {
-		// TODO Auto-generated constructor stub
-	}
+	public Playlist() {	}
 
 	public Playlist(String nombre, String descripcion) {
 		super();
@@ -93,40 +86,25 @@ public class Playlist implements Serializable{
 	}
 	
 	/**
-	 * Añade canción 
-	 * @param cancion
-	 * @return
-	 * @throws ReproductorException
+	 * Añade canción a la lista
+	 * @param Cancion
+	 * @throws ReproductorException Salta en caso de que ya exista la canción en la lista
 	 */
-	public boolean addCancion1(Cancion cancion) throws ReproductorException {
-		boolean contiene = true;
-		LinkedList<Cancion> canciones = convertirALinked();
-		if (!canciones.contains(cancion)) {
-			canciones.push(cancion);
-			contiene = false;
-		} else {
-			throw new ReproductorException("La playlist ya contiene la canción escogida.");
-		}
-		this.canciones = canciones;
-		
-		return contiene;
-	}
-	
 	public void addCancion(Cancion cancion) throws ReproductorException {
-		if (canciones.contains(cancion))
+		if (canciones.contains(cancion))	//Comprueba que exista ya en la lista
 			throw new ReproductorException("La playlist ya contiene la canción escogida.");
-			
 		canciones.add(cancion);
 	}
 	
 	/**
 	 * Elimina una canción de la lista
-	 * @param cancion
-	 * @return
+	 * @param Cancion
+	 * @return boolean si la elimina o no
 	 */
 	public boolean eliminarCancion(Cancion cancion) {
 		boolean encontrada = false;
 		int contador = 0;
+		
 		while (!encontrada && contador < canciones.size()) {
 			if (canciones.get(contador).equals(cancion)) {
 				encontrada = true;
@@ -139,7 +117,7 @@ public class Playlist implements Serializable{
 	
 	/**
 	 * Cambia el nombre de la playlist
-	 * @param nombre
+	 * @param String nombre nuevo de la playlist
 	 * @throws ReproductorException
 	 */
 	public void cambiarNombre(String nombre) throws ReproductorException {
@@ -147,8 +125,6 @@ public class Playlist implements Serializable{
 			throw new ReproductorException("No puedes dejar el nombre vacío.");
 		
 		this.setNombre(nombre);
-		System.out.println("Se ha cambiado el nombre de la playlist correctamente.");
-		
 	}
 	
 	/**
@@ -157,20 +133,8 @@ public class Playlist implements Serializable{
 	 */
 	public void cambiarDescripcion(String descripcion) {
 		this.setDescripcion(descripcion);
-		System.out.println("Se ha cambiado la descripción de la playlist correctamente.");
 	}
 	
-	public LinkedList<Cancion> convertirALinked() {
-		LinkedList<Cancion> lista = new LinkedList<Cancion>();
-		
-		for (Cancion c : this.getCanciones()) {
-			lista.add(c);
-		}
-		
-		return lista;
-	}
-	
-
 
 	public int getId() {
 		return id;
@@ -183,6 +147,7 @@ public class Playlist implements Serializable{
 	public LocalTime getDuracion() {
 		LocalTime tiempo = LocalTime.of(0, 0, 0);
 		int horas, minutos, segundos;
+		
 		for (Cancion cancion : canciones) {
 			horas = cancion.getDuración().getHour();
 			minutos = cancion.getDuración().getMinute();

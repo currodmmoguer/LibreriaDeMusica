@@ -14,25 +14,21 @@ public class PlaylistDAO extends GenericDAO<Playlist> {
 	}
 
 	/**
-	 * Devuelve una lista con todas las coincidencias que encuentre
-	 * @param nombre de la Playlist 
-	 * @return lista con todas las coincidencias
+	 * Obtiene una lista de playlists cuyo nombre de la playlist contenga lo indicado por parámetro
+	 * @param String nombre de la Playlist 
+	 * @return List<Playlist> lista con todas las coincidencias
 	 */
 	public List<Playlist> buscarPlaylist(String nombre){
-		List<Playlist> lista;
-		Query query = session.createQuery("SELECT p FROM Playlist p WHERE Nombre LIKE '%" + nombre + "%'");
-		lista = query.list();
-		return lista;
+		return session.createQuery("SELECT p FROM Playlist p WHERE Nombre LIKE '%" + nombre + "%'").list();
 	}
 	
 	/**
 	 * Obtiene una playlist indicando su id
-	 * @param id
+	 * @param int ID
 	 * @return Playlist
 	 */
 	public Playlist getPlaylist(int id) {
-		Playlist playlist = (Playlist) session.get(Playlist.class, id);
-		return playlist;
+		return (Playlist) session.get(Playlist.class, id);
 	}
 	
 	/**
@@ -40,25 +36,23 @@ public class PlaylistDAO extends GenericDAO<Playlist> {
 	 * @return List<Playlist>
 	 */
 	public List<Playlist> obtenerTodasPlaylists(){
-		List<Playlist> lista = session.createQuery("SELECT p FROM Playlist p").list();
-		return lista;
+		return session.createQuery("SELECT p FROM Playlist p").list();
 	}
 	
 	/**
-	 * Obtiene una lista en orden descendiente de la cantidad de canciones por cada genero que tiene una playlist
-	 * @param playlist
-	 * @return List<Object[]>
+	 * Obtiene el género musical que mas canciones tiene una playlist
+	 * @param Playlist
+	 * @return Object[2] [0]=cantidad, [1]=nombre del género
 	 */
 	public Object[] obtenerGeneroMasEscuchado(Playlist playlist){
 		Query query = session.createQuery("SELECT COUNT(c) as cantidad, c.genero "
-				+ "FROM Cancion c "
-				+ "JOIN c.playlists p "
-				+ "WHERE p.id= :idPlaylist "
-				+ "GROUP BY c.genero "
-				+ "ORDER BY cantidad DESC").setMaxResults(1);
+											+ "FROM Cancion c "
+											+ "JOIN c.playlists p "
+											+ "WHERE p.id= :idPlaylist "
+											+ "GROUP BY c.genero "
+											+ "ORDER BY cantidad DESC").setMaxResults(1);
 		query.setParameter("idPlaylist", playlist.getId());
-		Object[] genero = (Object[]) query.list().get(0);
-		return genero;
+		return (Object[]) query.list().get(0);
 	}
 
 }

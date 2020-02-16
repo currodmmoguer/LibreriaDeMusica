@@ -47,7 +47,6 @@ public class Cancion implements Serializable {
 
 	@ManyToMany(mappedBy = "canciones", fetch = FetchType.LAZY)
 	@Cascade(CascadeType.SAVE_UPDATE)
-	//@Min(1)	Si lo descemoneto salta excepcion perso sigue el programa
 	@Valid
 	private Set<Artista> artistas;
 
@@ -93,10 +92,15 @@ public class Cancion implements Serializable {
 
 	}
 
-	public Cancion(String nombre, Set<Artista> listaArtistas, LocalTime duracion, Genero genero) {
+	public Cancion(String nombre, Set<Artista> artistas, LocalTime duracion, Genero genero) throws ReproductorException {
 
+		if (nombre == null || nombre.equals(""))
+			throw new ReproductorException("No se ha podido crear la canción porque no se puede crear sin nombre");
+		if (artistas.size() == 0)
+			throw new ReproductorException("No se ha podido crear la canción ya debe tener un artista mínimo");
+		
 		this.nombre = nombre;
-		this.artistas = listaArtistas;
+		this.artistas = artistas;
 		this.duracion = duracion;
 		this.genero = genero;
 	}
@@ -129,6 +133,10 @@ public class Cancion implements Serializable {
 		return duracion;
 	}
 
+	/**
+	 * Muestra la duración de la canción 
+	 * @return String de la duración en formato HH:MM:SS
+	 */
 	public String mostrarDuracion() {
 		return DateTimeFormatter.ISO_TIME.format(duracion);
 	}
@@ -141,6 +149,10 @@ public class Cancion implements Serializable {
 		return publicacion;
 	}
 
+	/**
+	 * Muestra la fecha de publicación de la canción
+	 * @return String de la fecha en formato YYYY-MM-DD
+	 */
 	public String mostrarFechaPublicacion() {
 		return DateTimeFormatter.ISO_DATE.format(publicacion);
 	}

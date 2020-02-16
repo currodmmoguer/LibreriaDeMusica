@@ -9,6 +9,9 @@ public class HibernateUtil {
 
 	private static SessionFactory sessionFactory;
 
+	/**
+	 * Asigna valor al SessionFactory
+	 */
 	private HibernateUtil() {
 		Configuration configuration = new Configuration();
 		configuration.configure();
@@ -17,12 +20,19 @@ public class HibernateUtil {
 		sessionFactory = configuration.buildSessionFactory(serviceRegistry);
 	}
 	
+	/**
+	 * Obtiene el SessionFactory. En caso de que no tenga valor asignado se lo asigna
+	 * @return SessionFactory
+	 */
 	public static SessionFactory getSessionFactory() {
 		if (sessionFactory == null)
 			new HibernateUtil();
 		return sessionFactory;
 	}
 	
+	/**
+	 * Cierra la sesión en caso de que esté inicializada y abiera
+	 */
 	public static void closeSessionFactory() {
         if ((sessionFactory!=null) && (sessionFactory.isClosed()==false)) {
             sessionFactory.close();

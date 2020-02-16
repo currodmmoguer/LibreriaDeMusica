@@ -27,7 +27,7 @@ public class Util {
 	 * Solicita un numero entero
 	 * 
 	 * @param Texto que se muestra solicitando el dato
-	 * @return el numero entero solicitado
+	 * @return int el numero entero solicitado
 	 */
 	public static int solicitarEntero(String msg) {
 		int entero = 0;
@@ -77,15 +77,22 @@ public class Util {
 	 */
 	public static boolean solicitarSN(String msg) {
 		boolean correcto, retorno;
-		char c;
+		char c = 0;
 		do {
-			correcto = true;
-			System.out.println(msg);
-			c = teclado.nextLine().toUpperCase().charAt(0);
-			if (c != 'S' && c != 'N') { // Comprueba que se introduzca S o N
+			try {
+				correcto = true;
+				System.out.println(msg);
+				c = teclado.nextLine().toUpperCase().charAt(0);
+				if (c != 'S' && c != 'N')  // Comprueba que se introduzca S o N
+					correcto = false;
+					
+			} catch (StringIndexOutOfBoundsException e) {
 				correcto = false;
-				System.out.println("Debes introducir 'S' o 'N' exclusivamente.");
 			}
+			
+			if (!correcto)
+				System.out.println("Debes introducir 'S' o 'N' exclusivamente.");
+			
 		} while (!correcto);
 
 		retorno = (c == 'S') ? true : false;
@@ -154,28 +161,7 @@ public class Util {
 		return publicacion;
 	}
 
-	/**
-	 * Crea un objeto canción para añadir a un album. La diferencia con el anterior
-	 * es que no solicita ni album ni fecha de publicación.
-	 * 
-	 * @param Artista
-	 * @return Canción
-	 * @throws ReproductorException
-	 */
-	public static Cancion crearObjetoCancionParaAlbum(Session session, Artista artista) throws ReproductorException {
-		CancionDAO daoCancion = new CancionDAO(session);
-		ArtistaDAO daoArtista = new ArtistaDAO(session);
-		String nombre = Util.solicitarCadena("Introduce el nombre de la cancion");
-		Set<Artista> listaArtistas = new HashSet<Artista>();
-		listaArtistas.add(artista);
-		LocalTime duracion = Util.solicitarHora("Introduce la duración de la canción (MM:SS): ");
-		Genero genero = solicitarGenero();
-		Cancion cancion = new Cancion(nombre, listaArtistas, duracion, genero);
-		listaArtistas.forEach(a -> a.getCanciones().add(cancion));
-		artista.addCancion(cancion);
-		daoCancion.guardar(cancion);
-		return cancion;
-	}
+
 
 	/**
 	 * Solicita el genero que puede tener una canción para su posterior asignación
