@@ -79,8 +79,7 @@ public class Cancion implements Serializable {
 	public Cancion(String nombre, Set<Artista> artistas, LocalTime duración, LocalDate publicacion, Genero genero)
 			throws ReproductorException {
 
-		if (nombre == null || nombre.equals(""))
-			throw new ReproductorException("No se ha podido crear la canción porque no se puede crear sin nombre");
+
 		if (artistas.size() == 0)
 			throw new ReproductorException("No se ha podido crear la canción ya debe tener un artista mínimo");
 

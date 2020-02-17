@@ -87,15 +87,25 @@ public class Principal {
 					c.getArtistas().remove(artista); // Elimina el artista de la canción
 					daoCancion.actualizar(c); // Lo actualiza en la base de datos
 				}
+				
+				//Recorre los albunes del artista para quitarle las asignaciones
+				//para que no salte las constricciones
+				for(Album a: artista.getAlbunes()) {	
+					a.setArtista(null);
+				}
 				artista.getCanciones().clear(); // Vacía la lista de canciones
+				artista.getAlbunes().clear();
+				
 				daoArtista.borrar(artista); // Borra el artista
 
-// En caso de que quisiera borrar las canciones, las borraria obtieniendo las
-// canciones por sus id anteriormente guardado en una lista
+				// En caso de que quisiera borrar las canciones, las borraria obtieniendo las
+				// canciones por sus id anteriormente guardado en una lista
 				if (Util.solicitarSN("¿Deseas borrar también sus canciones? (S/N)")) {
 					for (Integer i : listaIdCanciones) {
 						cancion = daoCancion.getCancion(i); // Obtiene el objeto cancion
+						
 						if (cancion.getArtistas().isEmpty()) {
+							cancion.setAlbum(null);
 							daoCancion.borrar(cancion); // Borra la canción de la base de datos
 						}
 					}
@@ -104,7 +114,7 @@ public class Principal {
 			session.getTransaction().commit();
 		} catch (ReproductorException e) {
 			System.err.println(e.getMessage());
-			session.getTransaction().rollback();
+			//session.getTransaction().rollback();
 		} finally {
 			session.close();
 		}
@@ -651,7 +661,6 @@ public class Principal {
 		session.beginTransaction();
 		try {
 			Playlist playlist = buscarPlaylist(session);
-			
 			playlist.cambiarNombre(Util.solicitarCadena("Introduce el nuevo nombre para la playlist: "));
 			dao.actualizar(playlist);
 			session.getTransaction().commit();
@@ -673,8 +682,8 @@ public class Principal {
 		Session session = HibernateUtil.getSessionFactory().openSession();
 		PlaylistDAO dao = new PlaylistDAO(session);
 		try {
-			Playlist playlist = buscarPlaylist(session);
 			session.beginTransaction();
+			Playlist playlist = buscarPlaylist(session);
 			playlist.cambiarDescripcion(Util.solicitarCadena("Introduce la nueva descripción para la playlist: "));
 			dao.actualizar(playlist);
 			session.getTransaction().commit();

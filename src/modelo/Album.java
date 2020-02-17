@@ -42,7 +42,7 @@ public class Album implements Serializable{
 	@Valid
 	private Artista artista;
 	
-	@OneToMany(fetch = FetchType.LAZY, orphanRemoval = true)
+	@OneToMany(fetch = FetchType.LAZY)
 	@Cascade(CascadeType.ALL)
 	@JoinColumn(name="IdAlbum")
 	@Size(min=1)
