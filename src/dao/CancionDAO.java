@@ -49,7 +49,6 @@ public class CancionDAO extends GenericDAO<Cancion> {
 										+ "ORDER BY cantidad DESC").setMaxResults(3);
 		return query.list();
 	}
-	
 	/**
 	 * Obtiene todas las canciones de un artista que no tiene un álbum asignado
 	 * @param artista

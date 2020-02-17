@@ -131,19 +131,19 @@ public class Principal {
 	}
 
 	/**
-	 * Muestra todos los álbunes de un artista
+	 * Muestra todos los álbumes de un artista
 	 * 
 	 */
-	private static void mostrarAlbunesArtista() {
+	private static void mostrarAlbumesArtista() {
 		Session session = HibernateUtil.getSessionFactory().openSession();
 		AlbumDAO dao = new AlbumDAO(session);
 
 		try {
 			Artista artista = buscarArtista(session);
-			List<Album> albunes = dao.obtenerAlbunesPorArtista(artista); // Obtiene la lista de álbunes
+			List<Album> albunes = dao.obtenerAlbunesPorArtista(artista); // Obtiene la lista de álbumes
 
 			if (albunes.size() == 0) // En caso de que no tenga ningun album
-				throw new ReproductorException(artista.getNombre() + " no tiene álbunes.");
+				throw new ReproductorException(artista.getNombre() + " no tiene álbumes.");
 
 			System.out.println("Albunes de " + artista.getNombre() + ":");
 			albunes.stream()
@@ -562,7 +562,7 @@ public class Principal {
 	/**
 	 * Muestra por consola todos los albunes de la base de datos
 	 */
-	private static void mostrarAlbunes() {
+	private static void mostrarAlbumes() {
 		Session session = HibernateUtil.getSessionFactory().openSession();
 		AlbumDAO dao = new AlbumDAO(session);
 		dao.obtenerTodosAlbunes().stream().forEach(System.out::println);
@@ -691,7 +691,7 @@ public class Principal {
 	/**
 	 * Añade una canción a una playlist
 	 */
-	private static void añadirCanciones() {
+	private static void añadirCancionPlaylist() {
 		Session session = HibernateUtil.getSessionFactory().openSession();
 		PlaylistDAO daoPlaylist = new PlaylistDAO(session);
 		try {
@@ -1119,7 +1119,7 @@ public class Principal {
 			mostrarTodosArtista();
 			break;
 		case 4:
-			mostrarAlbunesArtista();
+			mostrarAlbumesArtista();
 			break;
 		case 5:
 			mostrarCancionesArtista();
@@ -1142,7 +1142,7 @@ public class Principal {
 			consultarAlbum();
 			break;
 		case 4:
-			mostrarAlbunes();
+			mostrarAlbumes();
 			break;
 		}
 	}
@@ -1162,7 +1162,7 @@ public class Principal {
 			cambiarDescripcionPlaylist();
 			break;
 		case 5:
-			añadirCanciones();
+			añadirCancionPlaylist();
 			break;
 		case 6:
 			eliminarCancionPlaylist();

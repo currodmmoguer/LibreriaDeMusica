@@ -18,7 +18,7 @@ public class AlbumDAO extends GenericDAO<Album> {
 	 * @return List<Album> lista de albunes que coincidan
 	 */
 	public List<Album> obtenerListaAlbumPorNombre(String nombre){
-		return session.createQuery("SELECT a FROM Album a WHERE Nombre LIKE'%"+nombre+"%'").list();
+		return session.createQuery("SELECT a FROM Album a WHERE Nombre LIKE '%"+nombre+"%'").list();
 	}
 	
 	/**
